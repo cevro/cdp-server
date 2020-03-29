@@ -1,0 +1,3 @@
+[submodule "src/consts"]
+	path = src/consts
+	url = git@github.com:cevro/cdp-shared.git
