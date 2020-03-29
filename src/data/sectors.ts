@@ -1,0 +1,36 @@
+export interface SectorBackEndDefinition {
+    locoNetId: number
+}
+
+export const sectors: SectorBackEndDefinition[] = [
+    {locoNetId: 101},
+    {locoNetId: 102},
+    {locoNetId: 103},
+    {locoNetId: 104},
+    {locoNetId: 105},
+    {locoNetId: 106},
+    {locoNetId: 107},
+    {locoNetId: 108},
+    {locoNetId: 109},
+    {locoNetId: 110},
+    {locoNetId: 111},
+    {locoNetId: 112},
+    {locoNetId: 113},
+    {locoNetId: 114},
+    {locoNetId: 115},
+    {locoNetId: 116},
+    {locoNetId: 117},
+    {locoNetId: 118},
+    {locoNetId: 119},
+    {locoNetId: 120},
+    {locoNetId: 121},
+    {locoNetId: 122},
+    {locoNetId: 123},
+    {locoNetId: 124},
+    {locoNetId: 125},
+    {locoNetId: 126},
+    {locoNetId: 127},
+    {locoNetId: 128},
+    {locoNetId: 129},
+    {locoNetId: 130},
+];
