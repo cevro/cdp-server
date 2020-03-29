@@ -1,11 +1,9 @@
 import Signal from '../objects/Signal';
-import {
-    SignalState,
-} from '@definitions/interfaces';
 import {signals} from '@app/data/signals';
 import {Message} from '@definitions/messages';
 import LocoNetObjectsFactory from './LocoNetObjectsFactory';
 import LocoNetObject from '../objects/LocoNetObject';
+import {SignalState} from "@app/consts/signals/interfaces";
 
 class SignalsFactory extends LocoNetObjectsFactory<Message, SignalState> {
 
@@ -30,7 +28,7 @@ class SignalsFactory extends LocoNetObjectsFactory<Message, SignalState> {
         throw new Error();
     }
 
-    protected getObjects(): LocoNetObject<Message, any>[] {
+    protected getObjects(): Signal[] {
         return this.signals;
     }
 }

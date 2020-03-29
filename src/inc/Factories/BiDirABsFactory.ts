@@ -1,9 +1,9 @@
 import {Message} from '@definitions/messages';
 import BiDirAB from '../objects/AB/BiDirAB';
 import LocoNetObjectsFactory from './LocoNetObjectsFactory';
-import LocoNetObject from '../objects/LocoNetObject';
+import {BiDirABState} from "@app/consts/interfaces";
 
-class BiDirABsFactory extends LocoNetObjectsFactory<Message, any> {
+class BiDirABsFactory extends LocoNetObjectsFactory<Message, BiDirABState> {
     private readonly biDirABs: BiDirAB[];
 
     constructor() {
@@ -13,7 +13,7 @@ class BiDirABsFactory extends LocoNetObjectsFactory<Message, any> {
         });
     }
 
-    protected getObjects(): LocoNetObject<Message, any>[] {
+    protected getObjects(): BiDirAB[] {
         return this.biDirABs;
     }
 

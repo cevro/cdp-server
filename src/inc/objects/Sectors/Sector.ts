@@ -1,7 +1,3 @@
-import {
-    STATUS_FREE,
-    STATUS_UNDEFINED,
-} from '@app/consts/obvod/status';
 import {SectorState} from '@definitions/interfaces';
 import {LocoNetMessage} from '../../Factories/DateReceiver';
 import {locoNetConnector} from '../../SerialConnector/SerialConnector';
@@ -10,7 +6,11 @@ import {Message} from '@definitions/messages';
 import LocoNetObject from '../LocoNetObject';
 import {ENTITY_SECTOR} from '@definitions/entity';
 
-export default class Sector extends LocoNetObject<Message, SectorState> {
+export const STATUS_BUSY = 2;
+export const STATUS_FREE = 1;
+export const STATUS_UNDEFINED = -1;
+
+export default class Sector extends LocoNetObject<SectorState> {
     private _locked: number;
     private _state: number;
 

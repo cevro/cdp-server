@@ -1,10 +1,6 @@
 import TrainRoute from './TrainRoute';
-import {logger} from '@app/webSocetServer';
 import {routesFactory} from '../../Factories/RoutesFactory';
-import {
-    MESSAGE_ACTION_STATE_UPDATE,
-    TrainRouteBufferItem,
-} from '@definitions/interfaces';
+import {TrainRouteBufferItem,} from '@definitions/interfaces';
 
 export default class TrainRouteLock {
     public readonly buildOptions: any;
@@ -24,13 +20,13 @@ export default class TrainRouteLock {
         this.id = (new Date()).getTime();
         this.state = TrainRouteLock.STATE_WAITING;
         this.buildOptions = buildOptions;
-      /*  logger.log({
-            date: new Date(),
-            action: 'create',
-            entity: 'locker',
-            id: this.id,
-            data: null,
-        });*/
+        /*  logger.log({
+              date: new Date(),
+              action: 'create',
+              entity: 'locker',
+              id: this.id,
+              data: null,
+          });*/
     }
 
     public get state(): string {
@@ -38,13 +34,13 @@ export default class TrainRouteLock {
     }
 
     public sendState() {
-     /*   logger.log({
-            action: MESSAGE_ACTION_STATE_UPDATE,
-            entity: 'locker',
-            data: this.dumpData(),
-            id: this.id,
-            date: new Date(),
-        });*/
+        /*   logger.log({
+               action: MESSAGE_ACTION_STATE_UPDATE,
+               entity: 'locker',
+               data: this.dumpData(),
+               id: this.id,
+               date: new Date(),
+           });*/
     }
 
     public set state(value: string) {

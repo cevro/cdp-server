@@ -10,7 +10,7 @@ export interface ABState {
     locoNetId: number;
 }
 
-export default class BiDirAB extends LocoNetObject<Message, ABState> {
+export default class BiDirAB extends LocoNetObject<ABState> {
     private dir: ABDir;
 
     constructor(data: { locoNetId: number }) {

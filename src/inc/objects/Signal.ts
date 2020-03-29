@@ -1,12 +1,12 @@
-import {SignalState} from '@definitions/interfaces';
 import {LocoNetMessage} from '../Factories/DateReceiver';
 import {locoNetConnector} from '../SerialConnector/SerialConnector';
 import {ENTITY_SIGNAL} from '@definitions/entity';
 import {Message} from '@definitions/messages';
 import LocoNetObject from './LocoNetObject';
 import {LocoNetDefinition} from '@definitions/interfaces';
+import {SignalState} from "@app/consts/signals/interfaces";
 
-export default class Signal extends LocoNetObject<Message, SignalState> {
+export default class Signal extends LocoNetObject<SignalState> {
 
     private _displayAspect: number;
     private _requestedAspect: number;
@@ -23,14 +23,6 @@ export default class Signal extends LocoNetObject<Message, SignalState> {
 
     public getRequestedAspect() {
         return this._requestedAspect;
-    }
-
-    /**
-     * @deprecated
-     * @param value
-     */
-    public changeState(value: number) {
-        return this.requestChange(value);
     }
 
     public toObject(): SignalState {

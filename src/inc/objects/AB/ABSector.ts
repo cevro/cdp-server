@@ -2,13 +2,10 @@ import {LocoNetMessage} from '../../Factories/DateReceiver';
 import {locoNetConnector} from '../../SerialConnector/SerialConnector';
 import {ENTITY_AB_SECTOR} from '@definitions/entity';
 import LocoNetObject from '../LocoNetObject';
-import {
-    ClientToServerMessages,
-    StateUpdateData,
-} from '@definitions/messages/ABSector';
 import {Message} from "@definitions/messages";
+import {ABSectorState} from "@app/consts/interfaces";
 
-export default class ABSector extends LocoNetObject<ClientToServerMessages, StateUpdateData> {
+export default class ABSector extends LocoNetObject<ABSectorState> {
     private _error: number;
     private _state: number;
     private active: number;
@@ -56,7 +53,7 @@ export default class ABSector extends LocoNetObject<ClientToServerMessages, Stat
         this.blockCondition = -1;
     }
 
-    public toObject(): StateUpdateData {
+    public toObject(): ABSectorState {
         return {
             state: this.state,
             locoNetId: this.locoNetId,

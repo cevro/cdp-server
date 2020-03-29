@@ -7,12 +7,7 @@ import {routeBuilder} from './inc/Factories/RouteBuilder';
 import {turnoutsFactory} from './inc/Factories/TurnoutsFactory';
 import {signalFactory} from './inc/Factories/SignalsFactory';
 import {sectorFactory} from './inc/Factories/SectorsFactory';
-import {
-    DumpData,
-    MESSAGE_ACTION_DUMP,
-} from '@definitions/interfaces';
 import {HttpReceiver} from './inc/Factories/DateReceiver';
-import {routesFactory} from './inc/Factories/RoutesFactory';
 import {autoBlockSectorFactory} from './inc/Factories/ABSectorsFactory';
 import {biDirAutoBlockFactory} from './inc/Factories/BiDirABsFactory';
 import * as http from 'http';
@@ -47,7 +42,7 @@ export const logger = new class {
     private wsServer: server;
     private dataReceivers: HttpReceiver<Message>[] = [
         //routesFactory,
-        routeBuilder,
+      //  routeBuilder,
         turnoutsFactory,
         sectorFactory,
         autoBlockSectorFactory,

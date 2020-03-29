@@ -1,12 +1,11 @@
 import {
     LocoNetMessage,
     LocoNetReceiver,
-    HttpReceiver,
 } from '../Factories/DateReceiver';
 import {Message, METHOD_TYPE} from '@definitions/messages';
 import {logger} from '@app/webSocetServer';
 
-abstract class LocoNetObject<M extends Message, D> implements LocoNetReceiver {
+abstract class LocoNetObject<D> implements LocoNetReceiver {
 
     protected readonly locoNetId: number;
     private readonly entityName: string;
@@ -36,17 +35,17 @@ abstract class LocoNetObject<M extends Message, D> implements LocoNetReceiver {
 
     public abstract toObject(): D;
 
-    public handleGet(message: Message): void {
+    protected handleGet(message: Message): void {
         this.sendState();
     }
 
-    public handleDelete(message: Message): void {
+    protected handleDelete(message: Message): void {
     }
 
-    public handlePatch(message: Message): void {
+    protected handlePatch(message: Message): void {
     }
 
-    public handlePost(message: Message): void {
+    protected handlePost(message: Message): void {
     }
 
     public handle(method: METHOD_TYPE, message: Message): void {

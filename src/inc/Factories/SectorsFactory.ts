@@ -1,7 +1,6 @@
 import Sector from '../objects/Sectors/Sector';
 import {Message} from '@definitions/messages';
 import {sectors} from '@app/data/sectors';
-import LocoNetObject from '../objects/LocoNetObject';
 import LocoNetObjectsFactory from './LocoNetObjectsFactory';
 
 class SectorsFactory extends LocoNetObjectsFactory<Message> {
@@ -26,7 +25,7 @@ class SectorsFactory extends LocoNetObjectsFactory<Message> {
         throw new Error();
     }
 
-    protected getObjects(): LocoNetObject<Message, any>[] {
+    protected getObjects(): Sector[] {
         return this.sectors;
     }
 }

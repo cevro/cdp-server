@@ -1,18 +1,14 @@
-import {
-    TurnoutDefinition,
-    TurnoutPosition,
-    RequestedTurnoutPosition,
-} from '@definitions/points';
 import {PointLockedError} from '../../Exceptions/Errors';
 import {
     LocoNetMessage,
 } from '../../Factories/DateReceiver';
-import {TurnoutMessages} from '@definitions/messages/turnout';
 import {locoNetConnector} from '../../SerialConnector/SerialConnector';
 import LocoNetObject from '../LocoNetObject';
 import {Message} from "@definitions/messages";
+import {RequestedTurnoutPosition, TurnoutDefinition, TurnoutPosition} from "@app/consts/turnouts";
+import {TurnoutState} from "@app/consts/interfaces";
 
-export default class Turnout extends LocoNetObject<TurnoutMessages.RequestsType, TurnoutMessages.StateUpdateData> {
+export default class Turnout extends LocoNetObject<TurnoutState> {
     public readonly sector: number;
     private _position: TurnoutPosition;
     private _requestedPosition: RequestedTurnoutPosition;
@@ -69,7 +65,7 @@ export default class Turnout extends LocoNetObject<TurnoutMessages.RequestsType,
         this.sendState();
     }
 
-    public toObject(): TurnoutMessages.StateUpdateData {
+    public toObject(): TurnoutState {
         return {
             locoNetId: this.locoNetId,
             position: this.position,
@@ -82,7 +78,7 @@ export default class Turnout extends LocoNetObject<TurnoutMessages.RequestsType,
     }
 
     handlePatch(message: Message): void {
-        if(message.data.hasOwnProperty('requestedPosition')){
+        if (message.data.hasOwnProperty('requestedPosition')) {
             this.handleChangePositionRequest(message.data.requestedPosition);
         }
         super.handlePatch(message);

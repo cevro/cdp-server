@@ -1,11 +1,7 @@
-import {logger} from '@app/webSocetServer';
 import {
-    MESSAGE_ACTION_DUMP,
     TrainRouteBufferItem,
     TrainRouteDump,
 } from '@definitions/interfaces';
-import {NAVEST_STOJ} from '@app/consts/signal/signals';
-import {STATUS_BUSY} from '@app/consts/obvod/status';
 import TrainRouteLock from '../objects/Routes/TrainRouteLock';
 import {
     LocoNetMessage,
@@ -13,9 +9,10 @@ import {
 } from './DateReceiver';
 import {Message} from '@definitions/messages';
 import LocoNetObject from '../objects/LocoNetObject';
+import {SignalStrategy} from "@app/inc/Factories/SignalStrategy";
+import {STATUS_BUSY} from "@app/inc/objects/Sectors/Sector";
 
-class RouteBuilder extends LocoNetObject<Message, TrainRouteDump> implements HttpReceiver<Message> {
-    private readonly LOGGER_ENTITY = 'route-builder';
+class RouteBuilder extends LocoNetObject<TrainRouteDump> implements HttpReceiver<Message> {
 
     private _locked: boolean = false;
 
@@ -44,13 +41,13 @@ class RouteBuilder extends LocoNetObject<Message, TrainRouteDump> implements Htt
     }
 
     public printBuffer(): void {
-      /*  logger.log({
-            id: 0,
-            date: new Date(),
-            action: MESSAGE_ACTION_DUMP,
-            entity: this.LOGGER_ENTITY,
-            data: this.dumpBuffer(),
-        });*/
+        /*  logger.log({
+              id: 0,
+              date: new Date(),
+              action: MESSAGE_ACTION_DUMP,
+              entity: this.LOGGER_ENTITY,
+              data: this.dumpBuffer(),
+          });*/
     }
 
     public refreshRoutes() {
@@ -62,11 +59,11 @@ class RouteBuilder extends LocoNetObject<Message, TrainRouteDump> implements Htt
     }
 
     public handleMessageReceive(message: Message): void {
-     /*   switch (message.action) {
-            case 'build':
-                this.addToBuffer(message.data.id, message.data.buildOptions);
-                break;
-        }*/
+        /*   switch (message.action) {
+               case 'build':
+                   this.addToBuffer(message.data.id, message.data.buildOptions);
+                   break;
+           }*/
 
         this.refreshRoutes();
         this.tryBuild();
@@ -153,7 +150,7 @@ class RouteBuilder extends LocoNetObject<Message, TrainRouteDump> implements Htt
         }
         const trainRoute = locker.route;
         if (this.hasError) {
-            trainRoute.startSignal.requestChange(NAVEST_STOJ);
+            trainRoute.startSignal.requestChange(SignalStrategy.NAVEST_STOJ);
             return;
         }
 
@@ -168,7 +165,7 @@ class RouteBuilder extends LocoNetObject<Message, TrainRouteDump> implements Htt
             trainRoute.recalculateSignal(locker.buildOptions);
             return;
         } else {
-            locker.route.startSignal.requestChange(NAVEST_STOJ);
+            locker.route.startSignal.requestChange(SignalStrategy.NAVEST_STOJ);
 
             let busyIndex = 0;
             for (const index in sectors) {

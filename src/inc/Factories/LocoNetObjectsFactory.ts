@@ -8,7 +8,7 @@ import LocoNetObject from '../objects/LocoNetObject';
 
 abstract class LocoNetObjectsFactory<M extends Message, D = any> implements HttpReceiver<M>, LocoNetReceiver {
 
-    protected abstract getObjects(): LocoNetObject<M, D>[];
+    protected abstract getObjects(): LocoNetObject<D>[];
 
 
     public handlePatch(message: M): void {
@@ -35,7 +35,7 @@ abstract class LocoNetObjectsFactory<M extends Message, D = any> implements Http
         });
     }
 
-    protected matchMessage(message: M, object: LocoNetObject<M, D>): boolean {
+    protected matchMessage(message: M, object: LocoNetObject<D>): boolean {
         const match = message.uri.match(/([a-zA-Z_]+)\/([0-9]+)/);
         const [, entity, id] = match;
 
