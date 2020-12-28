@@ -2,17 +2,15 @@ import {
     TrainRouteBufferItem,
     TrainRouteDump,
 } from '@definitions/interfaces';
-import TrainRouteLock from '../objects/Routes/TrainRouteLock';
+import TrainRouteLock from '../models/Routes/TrainRouteLock';
 import {
     LocoNetMessage,
-    HttpReceiver,
 } from './DateReceiver';
-import {Message} from '@definitions/messages';
-import LocoNetObject from '../objects/LocoNetObject';
-import {SignalStrategy} from "@app/inc/Factories/SignalStrategy";
-import {STATUS_BUSY} from "@app/inc/objects/Sectors/Sector";
+import { Message } from '@definitions/messages';
+import { SignalStrategy } from 'app/schema/services/SignalStrategy';
+import { STATUS_BUSY } from 'app/schema/models/Sectors/Sector';
 
-class RouteBuilder extends LocoNetObject<TrainRouteDump> implements HttpReceiver<Message> {
+class RouteBuilder /*extends LocoNetObject<TrainRouteDump> */ {
 
     private _locked: boolean = false;
 
@@ -21,7 +19,7 @@ class RouteBuilder extends LocoNetObject<TrainRouteDump> implements HttpReceiver
     private hasError: boolean;
 
     public constructor() {
-        super(0, 'route-builder');
+        //   super(0, 'route-builder');
     }
 
     public addToBuffer(trainRouteId: number, buildOptions: any): void {
@@ -175,9 +173,9 @@ class RouteBuilder extends LocoNetObject<TrainRouteDump> implements HttpReceiver
                  }*/
                 if (sector.state === STATUS_BUSY) {
                     // posledný sektor znamená zhodenie VC
-                    if (sector.getLocoNetId() === trainRoute.endSector.getLocoNetId()) {
-                        this.destroyRoute(locker);
-                    }
+                    //  if (sector.getLocoNetId() === trainRoute.endSector.getLocoNetId()) {
+                    //    this.destroyRoute(locker);
+                    // }
                     busyIndex = +index;
                     break;
                 }
@@ -194,7 +192,7 @@ class RouteBuilder extends LocoNetObject<TrainRouteDump> implements HttpReceiver
             if (sectors.hasOwnProperty(unalockIndex)) {
                 if (sectors[unalockIndex].locked === locker.getId()) {
                     locker.route.turnoutPositions.forEach((pointPosition) => {
-                        pointPosition.unlockBySector(locker.getId(), sectors[unalockIndex].getLocoNetId());
+                        //pointPosition.unlockBySector(locker.getId(), sectors[unalockIndex].getLocoNetId());
                     });
                     sectors[unalockIndex].unlock(locker.getId());
                 }

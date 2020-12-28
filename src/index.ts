@@ -1,21 +1,18 @@
-import { logger } from './webSocetServer';
-import { locoNetConnector } from './inc/SerialConnector/SerialConnector';
-import { autoBlockSectorFactory } from './inc/Factories/ABSectorsFactory';
-import { signalFactory } from './inc/Factories/SignalsFactory';
-import { sectorFactory } from './inc/Factories/SectorsFactory';
-import { biDirAutoBlockFactory } from './inc/Factories/BiDirABsFactory';
+import { schemaLoader } from 'app/schema/schemaLoader';
+import { logger } from 'app/webSocetServer';
 
 class Main {
 
     public async run() {
+        schemaLoader.load();
         logger.run();
 
-        locoNetConnector.registerListener(autoBlockSectorFactory);
-        locoNetConnector.registerListener(signalFactory);
-        locoNetConnector.registerListener(sectorFactory);
-        locoNetConnector.registerListener(biDirAutoBlockFactory);
-        locoNetConnector.tryConnect();
-        console.log('run');
+        //  locoNetConnector.registerListener(autoBlockSectorFactory);
+        //    locoNetConnector.registerListener(signalFactory);
+        // locoNetConnector.registerListener(sectorFactory);
+        // locoNetConnector.registerListener(biDirAutoBlockFactory);
+        // locoNetConnector.tryConnect();
+        // console.log('run');
     }
 }
 

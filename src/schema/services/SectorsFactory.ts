@@ -1,6 +1,6 @@
-import Sector from '../objects/Sectors/Sector';
+import Sector from '../models/Sectors/Sector';
 import {Message} from '@definitions/messages';
-import {sectors} from '@app/data/sectors';
+import {sectors} from 'app/data/sectors';
 import LocoNetObjectsFactory from './LocoNetObjectsFactory';
 
 class SectorsFactory extends LocoNetObjectsFactory<Message> {

@@ -1,14 +1,9 @@
-import BiDirAutoBlock from '../AB/BiDirAB';
+import BiDirAutoBlock from '../autoBlock/BiDirAB';
 import {
     ABRequestedDir,
 } from '@definitions/interfaces';
-import {
-    LocoNetMessage,
-    LocoNetReceiver,
-    HttpReceiver,
-} from '../../Factories/DateReceiver';
-import {locoNetConnector} from '../../SerialConnector/SerialConnector';
-import {Message} from '@definitions/messages';
+import { Message } from '@definitions/messages';
+import { LocoNetMessage, LocoNetReceiver } from 'app/schema/services/DateReceiver';
 
 export default class TrackApproval implements LocoNetReceiver/*, HttpReceiver<Message<any>>*/ {
 
@@ -40,26 +35,26 @@ export default class TrackApproval implements LocoNetReceiver/*, HttpReceiver<Me
     }
 
     public handleMessageReceive(message: Message) {
-      /*  if (message.id !== this.locoNetId) {
-            return;
-        }
+        /*  if (message.id !== this.locoNetId) {
+              return;
+          }
 
-        switch (message.action) {
-            case 'unlock':
-                locoNetConnector.send({
-                    locoNetId: this.ABId,
-                    type: 'l',
-                    value: 0,
-                });
-                break;
-            case 'lock':
-                locoNetConnector.send({
-                    locoNetId: this.ABId,
-                    type: 'l',
-                    value: 1,
-                });
-                break;
-        }*/
+          switch (message.action) {
+              case 'unlock':
+                  locoNetConnector.send({
+                      locoNetId: this.ABId,
+                      type: 'l',
+                      value: 0,
+                  });
+                  break;
+              case 'lock':
+                  locoNetConnector.send({
+                      locoNetId: this.ABId,
+                      type: 'l',
+                      value: 1,
+                  });
+                  break;
+          }*/
     }
 
     public lock(id: number) {

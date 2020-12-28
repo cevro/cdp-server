@@ -1,8 +1,8 @@
-import Turnout from '../objects/Turnout/Turnout';
+import Turnout from '../models/Turnout/Turnout';
 import LocoNetObjectsFactory from './LocoNetObjectsFactory';
 import {Message} from '@definitions/messages';
-import {getAllTurnouts} from "@app/consts/turnouts";
-import {TurnoutState} from "@app/consts/interfaces";
+import {getAllTurnouts} from "app/consts/turnouts";
+import {TurnoutState} from "app/consts/interfaces";
 
 class PointsFactory extends LocoNetObjectsFactory<Message, TurnoutState> {
 
@@ -22,9 +22,9 @@ class PointsFactory extends LocoNetObjectsFactory<Message, TurnoutState> {
     public findById(id: number): Turnout {
         for (const index in this.turnouts) {
             if (this.turnouts.hasOwnProperty(index)) {
-                if (this.turnouts[index].getLocoNetId() === id) {
-                    return this.turnouts[index];
-                }
+            //    if (this.turnouts[index].getLocoNetId() === id) {
+            //        return this.turnouts[index];
+            //    }
             }
         }
         throw new Error();

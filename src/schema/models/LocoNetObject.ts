@@ -1,9 +1,9 @@
 import {
     LocoNetMessage,
     LocoNetReceiver,
-} from '../Factories/DateReceiver';
-import {Message, METHOD_TYPE} from '@definitions/messages';
-import {logger} from '@app/webSocetServer';
+} from 'app/schema/services/DateReceiver';
+import { Message, METHOD_TYPE } from '@definitions/messages';
+import { logger } from 'app/webSocetServer';
 
 abstract class LocoNetObject<D> implements LocoNetReceiver {
 
@@ -50,13 +50,13 @@ abstract class LocoNetObject<D> implements LocoNetReceiver {
 
     public handle(method: METHOD_TYPE, message: Message): void {
         switch (method) {
-            case "delete":
+            case 'delete':
                 return this.handleDelete(message);
-            case "get":
+            case 'get':
                 return this.handleGet(message);
-            case "patch":
+            case 'patch':
                 return this.handlePatch(message);
-            case "post":
+            case 'post':
                 return this.handlePost(message);
         }
     }

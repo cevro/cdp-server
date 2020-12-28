@@ -1,6 +1,6 @@
 import TrainRoute from './TrainRoute';
-import {routesFactory} from '../../Factories/RoutesFactory';
-import {TrainRouteBufferItem,} from '@definitions/interfaces';
+import { TrainRouteBufferItem } from '@definitions/interfaces';
+import { routesFactory } from 'app/schema/services/RoutesFactory';
 
 export default class TrainRouteLock {
     public readonly buildOptions: any;
@@ -65,10 +65,10 @@ export default class TrainRouteLock {
     public check(): boolean {
         const route = this.route;
         try {
-            const pointPositions = route.getTurnoutPositions();
-            for (const id in pointPositions) {
+            const pointPositions = route.turnoutPositions;
+            for (const id in route.turnoutPositions) {
                 const pointPosition = pointPositions[id];
-                pointPosition.check();
+                //  pointPosition.check();
             }
             const sectors = route.getSectors();
             for (const id in sectors) {
@@ -93,10 +93,10 @@ export default class TrainRouteLock {
         this.state = TrainRouteLock.STATE_BUILDING;
         routeBuilder.printBuffer();
         try {
-            const pointPositions = trainRoute.getTurnoutPositions();
+            const pointPositions = trainRoute.turnoutPositions;
             for (const id in pointPositions) {
                 const pointPosition = pointPositions[id];
-                await pointPosition.lock(this.getId());
+                //await pointPosition.lock(this.getId());
             }
 
             const sectors = trainRoute.getSectors();
@@ -117,10 +117,10 @@ export default class TrainRouteLock {
     }
 
     public destroyRoute(): void {
-        const pointPositions = this.route.getTurnoutPositions();
+        const pointPositions = this.route.turnoutPositions;
         for (const id in pointPositions) {
             const pointPosition = pointPositions[id];
-            pointPosition.unlock(this.getId());
+            // pointPosition.unlock(this.getId());
         }
         const sectors = this.route.getSectors();
         for (const id in sectors) {

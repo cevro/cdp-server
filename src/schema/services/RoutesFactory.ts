@@ -1,8 +1,6 @@
-import TrainRoute from '../objects/Routes/TrainRoute';
+import TrainRoute from '../models/Routes/TrainRoute';
 import {Message} from '@definitions/messages';
 import {RouteFinderRequest} from '@definitions/interfaces';
-import {logger} from '@app/webSocetServer';
-import {HttpReceiver} from './DateReceiver';
 
 class RoutesFactory/* implements HttpReceiver<Message>*/ {
     private readonly routes: TrainRoute[];

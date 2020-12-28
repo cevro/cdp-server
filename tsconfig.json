@@ -15,7 +15,7 @@
       "@definitions/*": [
         "src/consts/*"
       ],
-      "@app/*": [
+      "app/*": [
         "src/*"
       ]
     }

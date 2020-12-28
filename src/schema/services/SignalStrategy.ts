@@ -1,4 +1,4 @@
-import Signal from '../objects/Signal';
+import Signal from '../models/Signal';
 import {BuildOptions} from '@definitions/interfaces';
 
 export const SignalStrategy = new class {

@@ -1,10 +1,10 @@
-import TurnoutPosition from '../../../inc/objects/Turnout/TurnoutPosition';
+import TurnoutPosition, { TurnoutPositionDef } from '../../../schema/models/Turnout/turnoutPosition';
 
 export interface TrainRouteDefinition {
     id: number;
     name: string;
     sectorIds: number[];
-    turnoutPositions: TurnoutPosition[];
+    turnoutPositions: TurnoutPositionDef[];
     startSignalId: number;
     endSignalId?: number;
     endSectorId: number;
@@ -25,9 +25,12 @@ const routes1L: TrainRouteDefinition[] = [
             1005,
         ],
         turnoutPositions: [
-            new TurnoutPosition(2, 1, [{id: 4, position: 1}]),
-            new TurnoutPosition(7, 1, [{id: 5, position: 1}]),
-            new TurnoutPosition(9, 1),
+            TurnoutPosition.create(2, 1),
+            TurnoutPosition.create(2, 1),
+            TurnoutPosition.create(7, 1),
+            TurnoutPosition.create(9, 1),
+            TurnoutPosition.create(4, 1),
+            TurnoutPosition.create(5, 1),
         ],
         startSignalId: 1,
         endSignalId: 3,
@@ -65,10 +68,12 @@ const routes1L: TrainRouteDefinition[] = [
             3010,
         ],
         turnoutPositions: [
-            new TurnoutPosition(2, 1, [{id: 4, position: 1}]),
-            new TurnoutPosition(7, 1, [{id: 5, position: 1}]),
-            new TurnoutPosition(9, -1),
-            new TurnoutPosition(13, 1),
+            TurnoutPosition.create(2, 1),
+            TurnoutPosition.create(4, 1),
+            TurnoutPosition.create(7, 1),
+            TurnoutPosition.create(5, 1),
+            TurnoutPosition.create(9, -1),
+            TurnoutPosition.create(13, 1),
         ],
         startSignalId: 1,
         endSignalId: 106,
@@ -86,7 +91,7 @@ export const routes3L: TrainRouteDefinition[] = [
             3110,
         ],
         turnoutPositions: [
-            new TurnoutPosition(23, 1),
+            TurnoutPosition.create(23, 1),
         ],
         startSignalId: 106,
         endSignalId: 5,
@@ -104,14 +109,15 @@ export const routes3L: TrainRouteDefinition[] = [
             102,
         ],
         turnoutPositions: [
-            new TurnoutPosition(33, -1),
+            TurnoutPosition.create(33, -1),
 
-            new TurnoutPosition(36, -1),
-            new TurnoutPosition(41, -1),
+            TurnoutPosition.create(36, -1),
+            TurnoutPosition.create(41, -1),
 
-            new TurnoutPosition(42, 1, [{id: 40, position: 1}]),
-
-            new TurnoutPosition(43, 1, [{id: 44, position: 1}]),
+            TurnoutPosition.create(42, 1),
+            TurnoutPosition.create(40, 1),
+            TurnoutPosition.create(43, 1),
+            TurnoutPosition.create(44, 1),
 
         ],
         startSignalId: 5,
@@ -131,9 +137,11 @@ export const routes3L: TrainRouteDefinition[] = [
             102,
         ],
         turnoutPositions: [
-            new TurnoutPosition(33, -1),
-            new TurnoutPosition(36, 1, [{id: 41, position: 1}]),
-            new TurnoutPosition(43, 1, [{id: 44, position: 1}]),
+            TurnoutPosition.create(33, -1),
+            TurnoutPosition.create(36, 1),
+            TurnoutPosition.create(41, 1),
+            TurnoutPosition.create(43, 1),
+            TurnoutPosition.create(44, 1),
         ],
         startSignalId: 5,
         endSignalId: null,
@@ -152,7 +160,7 @@ export const routes3S: TrainRouteDefinition[] = [
             3010,
         ],
         turnoutPositions: [
-            new TurnoutPosition(23, 1),
+            TurnoutPosition.create(23, 1),
         ],
         startSignalId: 24,
         endSignalId: 28,

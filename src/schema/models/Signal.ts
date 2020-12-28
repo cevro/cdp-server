@@ -1,18 +1,24 @@
-import {LocoNetMessage} from '../Factories/DateReceiver';
-import {locoNetConnector} from '../SerialConnector/SerialConnector';
-import {ENTITY_SIGNAL} from '@definitions/entity';
-import {Message} from '@definitions/messages';
-import LocoNetObject from './LocoNetObject';
-import {LocoNetDefinition} from '@definitions/interfaces';
-import {SignalState} from "@app/consts/signals/interfaces";
+import { Message } from '@definitions/messages';
+import { LocoNetMessage } from 'app/schema/services/DateReceiver';
+import { locoNetConnector } from 'app/inc/SerialConnector/SerialConnector';
 
-export default class Signal extends LocoNetObject<SignalState> {
+interface QueryRow {
+    signal_id: number;
+    loconet_id: number;
+    name: string;
+}
+
+export default class Signal /*extends LocoNetObject<SignalState>*/ {
 
     private _displayAspect: number;
     private _requestedAspect: number;
 
-    public constructor(definition: LocoNetDefinition) {
-        super(definition.locoNetId, ENTITY_SIGNAL);
+    public readonly signalId: number;
+    public readonly name: string;
+
+    public constructor(row: QueryRow) {
+        this.signalId = row.signal_id;
+        this.name = row.name;
         this._displayAspect = -1;
         this._requestedAspect = -1;
     }
@@ -23,14 +29,6 @@ export default class Signal extends LocoNetObject<SignalState> {
 
     public getRequestedAspect() {
         return this._requestedAspect;
-    }
-
-    public toObject(): SignalState {
-        return {
-            displayAspect: this._displayAspect,
-            requestedAspect: this._requestedAspect,
-            locoNetId: this.locoNetId,
-        };
     }
 
     public handleLocoNetReceive(data: LocoNetMessage): void {
@@ -50,11 +48,11 @@ export default class Signal extends LocoNetObject<SignalState> {
         }
         this._requestedAspect = aspect;
         locoNetConnector.send({
-            locoNetId: this.locoNetId,
+            locoNetId: 1,// this.locoNetId,
             type: 'a',
             value: aspect,
         });
-        this.sendState();
+        //   this.sendState();
     }
 
     public handlePatch(message: Message): void {
@@ -66,6 +64,6 @@ export default class Signal extends LocoNetObject<SignalState> {
             return;
         }
         this._displayAspect = value;
-        this.sendState();
+        //     this.sendState();
     }
 }

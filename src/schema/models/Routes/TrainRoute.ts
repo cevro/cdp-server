@@ -1,18 +1,24 @@
 import Signal from '../Signal';
-import TurnoutPosition from '../Turnout/TurnoutPosition';
+import { TurnoutPositionDef } from '../Turnout/turnoutPosition';
 import Sector from '../Sectors/Sector';
-import { signalFactory } from '../../Factories/SignalsFactory';
-import { sectorFactory } from '../../Factories/SectorsFactory';
-import { TrainRouteDefinition } from '@app/data/puchov/routes/1L';
-import { SignalStrategy } from '../../Factories/SignalStrategy';
+import { TrainRouteDefinition } from 'app/data/puchov/routes/1L';
 import { BuildOptions } from '@definitions/interfaces';
+import { RequestedTurnoutPosition } from 'app/consts/turnouts';
+import TrackApproval from 'app/schema/models/Routes/TrackApproval';
+import { signalFactory } from 'app/schema/services/signalService';
+import { sectorFactory } from 'app/schema/services/SectorsFactory';
+import { SignalStrategy } from 'app/schema/services/SignalStrategy';
 
 export default class TrainRoute {
     public id;
     public name: string;
 
     public readonly sectors: Sector[];
-    public readonly turnoutPositions: TurnoutPosition[];
+    public readonly turnoutPositions: TurnoutPositionDef[];
+    public readonly trackApprovals: Array<{
+        approval: TrackApproval;
+        position: RequestedTurnoutPosition;
+    }>;
     public startSignal: Signal;
     public endSignal: Signal;
     // public trackApproval: TrackApproval;
@@ -43,10 +49,6 @@ export default class TrainRoute {
     public getSectors(): Sector[] {
         return this.sectors;
     };
-
-    public getTurnoutPositions(): TurnoutPosition[] {
-        return this.turnoutPositions;
-    }
 
     public alock() {
     }

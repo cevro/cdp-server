@@ -1,7 +1,7 @@
 import {Message} from '@definitions/messages';
-import BiDirAB from '../objects/AB/BiDirAB';
+import BiDirAB from '../models/autoBlock/BiDirAB';
 import LocoNetObjectsFactory from './LocoNetObjectsFactory';
-import {BiDirABState} from "@app/consts/interfaces";
+import {BiDirABState} from "app/consts/interfaces";
 
 class BiDirABsFactory extends LocoNetObjectsFactory<Message, BiDirABState> {
     private readonly biDirABs: BiDirAB[];

@@ -2,16 +2,15 @@ import {
     connection,
     server,
 } from 'websocket';
-import {Message, METHOD_TYPE} from '@definitions/messages';
-import {routeBuilder} from './inc/Factories/RouteBuilder';
-import {turnoutsFactory} from './inc/Factories/TurnoutsFactory';
-import {signalFactory} from './inc/Factories/SignalsFactory';
-import {sectorFactory} from './inc/Factories/SectorsFactory';
-import {HttpReceiver} from './inc/Factories/DateReceiver';
-import {autoBlockSectorFactory} from './inc/Factories/ABSectorsFactory';
-import {biDirAutoBlockFactory} from './inc/Factories/BiDirABsFactory';
+import { Message, METHOD_TYPE } from '@definitions/messages';
+import { turnoutsFactory } from './schema/services/TurnoutsFactory';
+import { signalFactory } from './schema/services/signalService';
+import { sectorFactory } from './schema/services/SectorsFactory';
+import { HttpReceiver } from './schema/services/DateReceiver';
+import { autoBlockSectorFactory } from './schema/services/ABSectorsFactory';
+import { biDirAutoBlockFactory } from './schema/services/BiDirABsFactory';
 import * as http from 'http';
-import {ENTITY_AB_SECTOR, ENTITY_BI_DIR_AB, ENTITY_SECTOR, ENTITY_SIGNAL, ENTITY_TURNOUT} from "@definitions/entity";
+import { ENTITY_AB_SECTOR, ENTITY_BI_DIR_AB, ENTITY_SECTOR, ENTITY_SIGNAL, ENTITY_TURNOUT } from '@definitions/entity';
 
 const httpServer = http.createServer((request, response) => {
     // console.log((new Date()) + ' Received request for ' + request.url);
@@ -42,12 +41,12 @@ export const logger = new class {
     private wsServer: server;
     private dataReceivers: HttpReceiver<Message>[] = [
         //routesFactory,
-      //  routeBuilder,
+        //  routeBuilder,
         turnoutsFactory,
         sectorFactory,
         autoBlockSectorFactory,
         biDirAutoBlockFactory,
-        signalFactory,
+       // signalFactory,
     ];
 
     public run() {

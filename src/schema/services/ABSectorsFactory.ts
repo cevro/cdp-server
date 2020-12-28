@@ -1,8 +1,8 @@
-import ABSector from '../objects/AB/ABSector';
+import ABSector from '../models/autoBlock/autoBlockSector';
 import {ABSectors} from '@definitions/ABSectors/ABSectors';
 import LocoNetObjectsFactory from './LocoNetObjectsFactory';
 import {ABSectorState, LocoNetDefinition} from '@definitions/interfaces';
-import {Message} from "@app/consts/messages";
+import {Message} from "app/consts/messages";
 
 class ABSectorsFactory extends LocoNetObjectsFactory<Message, ABSectorState> {
     private readonly ABSectors: ABSector[];

@@ -1,11 +1,9 @@
-import {LocoNetMessage} from '../../Factories/DateReceiver';
-import {locoNetConnector} from '../../SerialConnector/SerialConnector';
-import {ENTITY_AB_SECTOR} from '@definitions/entity';
-import LocoNetObject from '../LocoNetObject';
-import {Message} from "@definitions/messages";
-import {ABSectorState} from "@app/consts/interfaces";
+import { locoNetConnector } from 'app/inc/SerialConnector/SerialConnector';
+import { Message } from '@definitions/messages';
+import { ABSectorState } from 'app/consts/interfaces';
+import { LocoNetMessage } from 'app/schema/services/DateReceiver';
 
-export default class ABSector extends LocoNetObject<ABSectorState> {
+export default class AutoBlockSector /*extends LocoNetObject<ABSectorState> */ {
     private _error: number;
     private _state: number;
     private active: number;
@@ -16,7 +14,7 @@ export default class ABSector extends LocoNetObject<ABSectorState> {
             return;
         }
         this._state = value;
-        this.sendState();
+        // this.sendState();
     }
 
     get state() {
@@ -28,7 +26,7 @@ export default class ABSector extends LocoNetObject<ABSectorState> {
             return;
         }
         this._error = value;
-        this.sendState();
+        // this.sendState();
     }
 
     get errorCode(): number {
@@ -46,7 +44,7 @@ export default class ABSector extends LocoNetObject<ABSectorState> {
     }
 
     constructor(data: any) {
-        super(data.locoNetId, ENTITY_AB_SECTOR);
+        //  super(data.locoNetId, ENTITY_AB_SECTOR);
         this._state = -1;
         this._error = -1;
         this.active = -1;
@@ -56,7 +54,7 @@ export default class ABSector extends LocoNetObject<ABSectorState> {
     public toObject(): ABSectorState {
         return {
             state: this.state,
-            locoNetId: this.locoNetId,
+            locoNetId: 1,// this.locoNetId,
             errorCode: this.errorCode,
             errorMessage: this.errorMessage,
             blockCondition: this.blockCondition,
@@ -74,11 +72,11 @@ export default class ABSector extends LocoNetObject<ABSectorState> {
                 break;
             case 'a':
                 this.active = data.value;
-                this.sendState();
+                //  this.sendState();
                 break;
             case 'c':
                 this.blockCondition = data.value;
-                this.sendState();
+                //  this.sendState();
                 break;
         }
         // console.log(this);
@@ -87,18 +85,18 @@ export default class ABSector extends LocoNetObject<ABSectorState> {
     handlePatch(message: Message): void {
         if (message.data.hasOwnProperty('blockCondition')) {
             locoNetConnector.send({
-                locoNetId: this.locoNetId,
+                locoNetId: 1,//this.locoNetId,
                 type: 'c',
                 value: message.data.blockCondition,
             });
         }
         if (message.data.hasOwnProperty('error')) {
             locoNetConnector.send({
-                locoNetId: this.locoNetId,
+                locoNetId: 1,// this.locoNetId,
                 type: 'e',
                 value: message.data.error,
             });
         }
-        super.handlePatch(message);
+        //    super.handlePatch(message);
     }
 }

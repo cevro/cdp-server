@@ -2,9 +2,9 @@ import * as SerialPort from 'serialport';
 import {
     LocoNetMessage,
     LocoNetReceiver,
-} from '../Factories/DateReceiver';
-import {PortInfo} from 'serialport';
-import {Message} from '@definitions/messages';
+} from 'app/schema/services/DateReceiver';
+import { PortInfo } from 'serialport';
+import { Message } from '@definitions/messages';
 
 class SerialConnector /*implements HttpReceiver<Message>*/ {
     private listeners: LocoNetReceiver[] = [];

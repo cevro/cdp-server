@@ -3,12 +3,12 @@ import {
     LocoNetReceiver,
     HttpReceiver,
 } from './DateReceiver';
-import {Message, METHOD_TYPE} from '@definitions/messages';
-import LocoNetObject from '../objects/LocoNetObject';
+import { Message, METHOD_TYPE } from '@definitions/messages';
+import LocoNetObject from '../models/LocoNetObject';
 
 abstract class LocoNetObjectsFactory<M extends Message, D = any> implements HttpReceiver<M>, LocoNetReceiver {
 
-    protected abstract getObjects(): LocoNetObject<D>[];
+    protected abstract getObjects(): /*LocoNetObject<D>*/any[];
 
 
     public handlePatch(message: M): void {

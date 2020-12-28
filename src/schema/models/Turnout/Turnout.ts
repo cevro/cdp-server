@@ -1,14 +1,11 @@
-import {PointLockedError} from '../../Exceptions/Errors';
-import {
-    LocoNetMessage,
-} from '../../Factories/DateReceiver';
-import {locoNetConnector} from '../../SerialConnector/SerialConnector';
-import LocoNetObject from '../LocoNetObject';
-import {Message} from "@definitions/messages";
-import {RequestedTurnoutPosition, TurnoutDefinition, TurnoutPosition} from "@app/consts/turnouts";
-import {TurnoutState} from "@app/consts/interfaces";
+import { Message } from '@definitions/messages';
+import { RequestedTurnoutPosition, TurnoutDefinition, TurnoutPosition } from 'app/consts/turnouts';
+import { TurnoutState } from 'app/consts/interfaces';
+import { PointLockedError } from 'app/inc/Exceptions/Errors';
+import { locoNetConnector } from 'app/inc/SerialConnector/SerialConnector';
+import { LocoNetMessage } from 'app/schema/services/DateReceiver';
 
-export default class Turnout extends LocoNetObject<TurnoutState> {
+export default class Turnout /* extends LocoNetObject<TurnoutState> */ {
     public readonly sector: number;
     private _position: TurnoutPosition;
     private _requestedPosition: RequestedTurnoutPosition;
@@ -16,7 +13,7 @@ export default class Turnout extends LocoNetObject<TurnoutState> {
     private lockedBy: number[] = [];
 
     constructor(definition: TurnoutDefinition) {
-        super(definition.locoNetId, 'turnout');
+        //super(definition.locoNetId, 'turnout');
 
         this._position = 0;
         this.sector = definition.sector;
@@ -25,7 +22,7 @@ export default class Turnout extends LocoNetObject<TurnoutState> {
 
     set position(value: TurnoutPosition) {
         this._position = value;
-        this.sendState();
+        // this.sendState();
     }
 
     get position() {
@@ -34,7 +31,7 @@ export default class Turnout extends LocoNetObject<TurnoutState> {
 
     set requestedPosition(value: RequestedTurnoutPosition) {
         this._requestedPosition = value;
-        this.sendState();
+        //  this.sendState();
     }
 
     get requestedPosition(): RequestedTurnoutPosition {
@@ -55,19 +52,19 @@ export default class Turnout extends LocoNetObject<TurnoutState> {
             await this.changePosition(position);
         }
         this.lockedBy.push(trainLockId);
-        this.sendState();
+        //   this.sendState();
     }
 
     public unlock(id: number) {
         this.lockedBy = this.lockedBy.filter((lockerId) => {
             return lockerId !== id;
         });
-        this.sendState();
+        //    this.sendState();
     }
 
     public toObject(): TurnoutState {
         return {
-            locoNetId: this.locoNetId,
+            locoNetId: 1,// this.locoNetId,
             position: this.position,
             requestedPosition: this.requestedPosition,
             locked: this.lockedBy,
@@ -81,13 +78,13 @@ export default class Turnout extends LocoNetObject<TurnoutState> {
         if (message.data.hasOwnProperty('requestedPosition')) {
             this.handleChangePositionRequest(message.data.requestedPosition);
         }
-        super.handlePatch(message);
+        //super.handlePatch(message);
     }
 
     private changePosition(position: RequestedTurnoutPosition) {
         this.requestedPosition = position;
         locoNetConnector.send({
-            locoNetId: this.locoNetId,
+            locoNetId: 1,// this.locoNetId,
             type: 's',
             value: position,
         });
