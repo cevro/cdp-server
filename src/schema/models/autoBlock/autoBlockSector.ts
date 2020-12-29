@@ -1,4 +1,4 @@
-import { locoNetConnector } from 'app/inc/SerialConnector/SerialConnector';
+import { locoNetConnector } from 'app/serialConnector/';
 import { Message } from '@definitions/messages';
 import { ABSectorState } from 'app/consts/interfaces';
 import { LocoNetMessage } from 'app/schema/services/DateReceiver';
@@ -82,10 +82,10 @@ export default class AutoBlockSector /*extends LocoNetObject<ABSectorState> */ {
         // console.log(this);
     }
 
-    handlePatch(message: Message): void {
+    public handlePatch(message: Message): void {
         if (message.data.hasOwnProperty('blockCondition')) {
             locoNetConnector.send({
-                locoNetId: 1,//this.locoNetId,
+                locoNetId: 1,// this.locoNetId,
                 type: 'c',
                 value: message.data.blockCondition,
             });

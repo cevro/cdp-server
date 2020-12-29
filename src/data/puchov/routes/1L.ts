@@ -1,4 +1,4 @@
-import TurnoutPosition, { TurnoutPositionDef } from '../../../schema/models/Turnout/turnoutPosition';
+import TurnoutPosition, { TurnoutPositionDef } from '../../../schema/models/turnoutPosition';
 
 export interface TrainRouteDefinition {
     id: number;

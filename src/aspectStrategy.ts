@@ -1,31 +1,33 @@
-import Signal from '../models/Signal';
-import {BuildOptions} from '@definitions/interfaces';
+import { Aspects } from 'app/./aspects';
+import RouteLock from 'app/routeLock';
 
-export const SignalStrategy = new class {
+export default class AspectStrategy {
+
     public readonly NAVEST_40_A_OCAKAVAJ_40 = 7;
     public readonly NAVEST_40_A_VOLNO = 4;
     public readonly NAVEST_40_A_VYSTRAHA = 6;
     public readonly NAVEST_OCAKAVAJ_40 = 3;
-    public readonly NAVEST_STOJ = 0;
-    public readonly NAVEST_VOLNO = 1;
-    public readonly NAVEST_VYSTRAHA = 2;
+    public readonly NAVEST_STOJ = Aspects.ASPECT_STOP;
+    public readonly NAVEST_VOLNO = Aspects.ASPECT_EXPECT_CLEAR;
+    public readonly NAVEST_VYSTRAHA = Aspects.ASPECT_EXPECT_STOP;
 
-    public calculate(endSignal: Signal, speed: number | null, sufficientDistance: boolean = true, buildOptions: BuildOptions): number {
-        let endSignalId = endSignal ? endSignal.getDisplayAspect() : 1;
-        if (buildOptions.PN) {
+    public static calculate(routeLock: RouteLock): number {
+
+        let endSignalId = routeLock.route.endSignal.displayAspect;
+        if (routeLock.buildOptions.PN) {
             return 8;
         }
-        if (buildOptions.alert) {
+        if (routeLock.buildOptions.alert) {
             endSignalId = 0;
         }
-        if (speed !== null || buildOptions['40']) {
-            return this.getSignalToSide(endSignalId, sufficientDistance);
+        if (routeLock.route.speed !== null || routeLock.buildOptions['40']) {
+            return this.getSignalToSide(endSignalId, routeLock.route.sufficientDistance);
         } else {
-            return this.getSignalStraight(endSignalId, sufficientDistance);
+            return this.getSignalStraight(endSignalId, routeLock.route.sufficientDistance);
         }
     };
 
-    private getSignalToSide(endSignalId: number, sufficientDistance: boolean) {
+    private static getSignalToSide(endSignalId: number, sufficientDistance: boolean) {
 
         switch (endSignalId) {
             case 0:
@@ -52,7 +54,7 @@ export const SignalStrategy = new class {
 
     };
 
-    private getSignalStraight(endSignalId: number, sufficientDistance: boolean): number {
+    private static getSignalStraight(endSignalId: number, sufficientDistance: boolean): number {
         switch (endSignalId) {
             case 0:
             case 8:

@@ -14,7 +14,11 @@ module.exports = {
             new TsConfigPathsPlugin(/* { configFileName, compiler } */)
         ]
     },
-
+    externals: [
+        {
+            formidable: 'commonjs formidable',
+        },
+    ],
 
     module: {
         rules: [

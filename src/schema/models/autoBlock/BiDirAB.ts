@@ -1,6 +1,6 @@
 import { LocoNetMessage } from 'app/schema/services/DateReceiver';
 import { ABDir } from '@definitions/interfaces';
-import { locoNetConnector } from 'app/inc/SerialConnector/SerialConnector';
+import { locoNetConnector } from 'app/serialConnector/';
 import { Message } from '@definitions/messages';
 
 export interface ABState {
@@ -20,10 +20,10 @@ export default class BiDirAB /*extends LocoNetObject<ABState>*/ {
         return this.dir;
     }
 
-    handlePatch(message: Message): void {
+    public handlePatch(message: Message): void {
         if (message.data.hasOwnProperty('dir')) {
             return locoNetConnector.send({
-                locoNetId: 1,//this.locoNetId,
+                locoNetId: 1,// this.locoNetId,
                 type: 'd',
                 value: message.data.dir,
             });

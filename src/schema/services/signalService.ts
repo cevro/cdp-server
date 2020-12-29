@@ -1,29 +1,31 @@
-import Signal from '../models/Signal';
+import ModelSignal from '../models/modelSignal';
 import { Connection } from 'mysql';
 
 class SignalService /*extends LocoNetObjectsFactory<Message, SignalState>*/ {
 
-    public readonly signals: Signal[] = [];
+    public readonly signals: ModelSignal[] = [];
 
     public async loadSchema(connection: Connection): Promise<void> {
-        await new Promise((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
             connection.query('SELECT * FROM `signal`;', (error, results) => {
                 if (error) {
                     reject(error);
+                    return;
                 }
                 results.forEach((row) => {
-                    this.signals.push(new Signal(row));
+                    this.signals.push(new ModelSignal(row));
                 });
                 resolve();
             });
         });
     }
 
-    public findById(id: number): Signal {
-        return this.signals.filter((signal) => {
-            return signal.signalId === id;
-        })[0];
+    public findById(id: number): ModelSignal {
+        const signals = this.signals.filter((signal) => {
+            return +signal.signalId === +id;
+        });
+        return signals[0];
     }
 }
 
-export const signalFactory = new SignalService();
+export const signalService = new SignalService()

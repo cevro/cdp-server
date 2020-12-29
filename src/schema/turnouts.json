@@ -1,0 +1,525 @@
+{
+  "zst.pu.t.1": {
+    "name": "1",
+    "locoNetId": 1,
+    "home": 1,
+    "SVGData": {
+      "x": 125,
+      "y": 60,
+      "rotate": 0,
+      "dir": "L"
+    },
+    "sector": 4001
+  },
+  "zst.pu.t.2": {
+    "name": "2",
+    "locoNetId": 2,
+    "home": 1,
+    "SVGData": {
+      "x": 150,
+      "y": 0,
+      "rotate": 0,
+      "dir": "P"
+    },
+    "sector": 1002
+  },
+  "zst.pu.t.3": {
+    "name": "3",
+    "locoNetId": 3,
+    "home": 1,
+    "SVGData": {
+      "x": 175,
+      "y": 30,
+      "rotate": 180,
+      "dir": "L"
+    },
+    "sector": 2002
+  },
+  "zst.pu.t.4": {
+    "name": "4",
+    "locoNetId": 4,
+    "home": 1,
+    "SVGData": {
+      "x": 200,
+      "y": 30,
+      "rotate": 180,
+      "dir": "P"
+    },
+    "sector": 2002
+  },
+  "zst.pu.t.5": {
+    "name": "5",
+    "locoNetId": 5,
+    "home": 1,
+    "SVGData": {
+      "x": 225,
+      "y": 30,
+      "rotate": 0,
+      "dir": "L"
+    }
+  },
+  "zst.pu.t.6": {
+    "name": "6",
+    "locoNetId": 6,
+    "home": 1,
+    "SVGData": {
+      "x": 275,
+      "y": 30,
+      "rotate": 0,
+      "dir": "P"
+    }
+  },
+  "zst.pu.t.7": {
+    "name": "7",
+    "locoNetId": 7,
+    "home": 1,
+    "SVGData": {
+      "x": 275,
+      "y": 0,
+      "rotate": 180,
+      "dir": "L"
+    },
+    "sector": 1003
+  },
+  "zst.pu.t.8": {
+    "name": "8",
+    "locoNetId": 8,
+    "home": 1,
+    "SVGData": {
+      "x": 325,
+      "y": 60,
+      "rotate": 180,
+      "dir": "P"
+    }
+  },
+  "zst.pu.t.9": {
+    "name": "9",
+    "locoNetId": 9,
+    "home": 1,
+    "SVGData": {
+      "x": 350,
+      "y": 0,
+      "rotate": 0,
+      "dir": "L"
+    },
+    "sector": 1004
+  },
+  "zst.pu.t.10": {
+    "name": "10",
+    "locoNetId": 10,
+    "home": 1,
+    "SVGData": {
+      "x": 375,
+      "y": 60,
+      "rotate": 0,
+      "dir": "P"
+    }
+  },
+  "zst.pu.t.11": {
+    "name": "11",
+    "locoNetId": 11,
+    "home": 1,
+    "SVGData": {
+      "x": 400,
+      "y": 30,
+      "rotate": 0,
+      "dir": "P"
+    }
+  },
+  "zst.pu.t.12": {
+    "name": "12",
+    "locoNetId": 12,
+    "home": 1,
+    "SVGData": {
+      "x": 575,
+      "y": 180,
+      "rotate": 26.23,
+      "dir": "L"
+    }
+  },
+  "zst.pu.t.13": {
+    "name": "13",
+    "home": 1,
+    "locoNetId": 13,
+    "SVGData": {
+      "x": 400,
+      "y": -30,
+      "rotate": -26.23,
+      "dir": "P"
+    }
+  },
+  "zst.pu.t.14a": {
+    "name": "14a",
+    "locoNetId": 1014,
+    "home": 1,
+    "SVGData": {
+      "x": 450,
+      "y": 60,
+      "rotate": 0,
+      "dir": "P"
+    }
+  },
+  "zst.pu.t.14b": {
+    "name": "14b",
+    "locoNetId": 2014,
+    "home": 1,
+    "SVGData": {
+      "x": 450,
+      "y": 60,
+      "rotate": 180,
+      "dir": "P"
+    }
+  },
+  "zst.pu.t.15": {
+    "name": "15",
+    "locoNetId": 15,
+    "home": -1,
+    "SVGData": {
+      "x": 500,
+      "y": 90,
+      "rotate": 26.23,
+      "dir": "L"
+    }
+  },
+  "zst.pu.t.16": {
+    "name": "16",
+    "locoNetId": 16,
+    "home": -1,
+    "SVGData": {
+      "x": 625,
+      "y": 210,
+      "rotate": 26.23,
+      "dir": "L"
+    }
+  },
+  "zst.pu.t.17": {
+    "name": "17",
+    "locoNetId": 17,
+    "home": 1,
+    "SVGData": {
+      "x": 550,
+      "y": 90,
+      "rotate": 0,
+      "dir": "P"
+    }
+  },
+  "zst.pu.t.18": {
+    "name": "18",
+    "locoNetId": 18,
+    "home": 1,
+    "SVGData": {
+      "x": 675,
+      "y": 210,
+      "rotate": 0,
+      "dir": "P"
+    }
+  },
+  "zst.pu.t.21a": {
+    "name": "21a",
+    "locoNetId": 1021,
+    "home": 1,
+    "SVGData": {
+      "x": 1150,
+      "y": 240,
+      "rotate": 180,
+      "dir": "L"
+    }
+  },
+  "zst.pu.t.21b": {
+    "name": "21b",
+    "locoNetId": 2021,
+    "home": 1,
+    "SVGData": {
+      "x": 1150,
+      "y": 240,
+      "rotate": 0,
+      "dir": "L"
+    }
+  },
+  "zst.pu.t.22": {
+    "name": "22",
+    "locoNetId": 22,
+    "home": 1,
+    "SVGData": {
+      "x": 1200,
+      "y": 210,
+      "rotate": 180,
+      "dir": "L"
+    }
+  },
+  "zst.pu.t.23": {
+    "name": "23",
+    "locoNetId": 23,
+    "home": 1,
+    "SVGData": {
+      "x": 1050,
+      "y": -30,
+      "rotate": 180,
+      "dir": "P"
+    }
+  },
+  "zst.pu.t.24": {
+    "name": "24",
+    "locoNetId": 24,
+    "home": 1,
+    "SVGData": {
+      "x": 1425,
+      "y": 0,
+      "rotate": 0,
+      "dir": "P"
+    }
+  },
+  "zst.pu.t.25": {
+    "name": "25",
+    "locoNetId": 25,
+    "home": 1,
+    "SVGData": {
+      "x": 1475,
+      "y": 30,
+      "rotate": 180,
+      "dir": "P"
+    }
+  },
+  "zst.pu.t.26": {
+    "name": "26",
+    "locoNetId": 26,
+    "home": 1,
+    "SVGData": {
+      "x": 1500,
+      "y": 30,
+      "rotate": 0,
+      "dir": "P"
+    }
+  },
+  "zst.pu.t.27": {
+    "name": "27",
+    "locoNetId": 27,
+    "home": 1,
+    "SVGData": {
+      "x": 1400,
+      "y": 180,
+      "rotate": 153.77,
+      "dir": "P"
+    }
+  },
+  "zst.pu.t.28": {
+    "name": "28",
+    "locoNetId": 28,
+    "home": 1,
+    "SVGData": {
+      "x": 1450,
+      "y": 150,
+      "rotate": 153.77,
+      "dir": "P"
+    }
+  },
+  "zst.pu.t.29a": {
+    "name": "29a",
+    "locoNetId": 1029,
+    "home": 1,
+    "SVGData": {
+      "x": 1550,
+      "y": 60,
+      "rotate": 180,
+      "dir": "P"
+    }
+  },
+  "zst.pu.t.29b": {
+    "name": "29b",
+    "locoNetId": 2029,
+    "home": 1,
+    "SVGData": {
+      "x": 1550,
+      "y": 60,
+      "rotate": 0,
+      "dir": "P"
+    }
+  },
+  "zst.pu.t.30": {
+    "name": "30",
+    "locoNetId": 30,
+    "home": 1,
+    "SVGData": {
+      "x": 1500,
+      "y": 120,
+      "rotate": 180,
+      "dir": "L"
+    }
+  },
+  "zst.pu.t.31": {
+    "name": "31",
+    "locoNetId": 31,
+    "home": 1,
+    "SVGData": {
+      "x": 1600,
+      "y": 120,
+      "rotate": 0,
+      "dir": "L"
+    }
+  },
+  "zst.pu.t.32a": {
+    "name": "32a",
+    "locoNetId": 1032,
+    "home": 1,
+    "SVGData": {
+      "x": 1600,
+      "y": 90,
+      "rotate": 180,
+      "dir": "P"
+    }
+  },
+  "zst.pu.t.30b": {
+    "name": "32b",
+    "locoNetId": 2032,
+    "home": 1,
+    "SVGData": {
+      "x": 1600,
+      "y": 90,
+      "rotate": 0,
+      "dir": "P"
+    }
+  },
+  "zst.pu.t.33": {
+    "name": "33",
+    "locoNetId": 33,
+    "home": 1,
+    "SVGData": {
+      "x": 1625,
+      "y": 0,
+      "rotate": 180,
+      "dir": "P"
+    }
+  },
+  "zst.pu.t.34a": {
+    "name": "34a",
+    "locoNetId": 1034,
+    "home": 1,
+    "SVGData": {
+      "x": 1650,
+      "y": 90,
+      "rotate": 180,
+      "dir": "L"
+    }
+  },
+  "zst.pu.t.34b": {
+    "name": "34b",
+    "locoNetId": 2034,
+    "home": 1,
+    "SVGData": {
+      "x": 1650,
+      "y": 90,
+      "rotate": 0,
+      "dir": "L"
+    }
+  },
+  "zst.pu.t.35a": {
+    "name": "35a",
+    "locoNetId": 1035,
+    "home": 1,
+    "SVGData": {
+      "x": 1650,
+      "y": 120,
+      "rotate": 180,
+      "dir": "P"
+    }
+  },
+  "zst.pu.t.35b": {
+    "name": "35b",
+    "locoNetId": 2035,
+    "home": 1,
+    "SVGData": {
+      "x": 1650,
+      "y": 120,
+      "rotate": 0,
+      "dir": "P"
+    }
+  },
+  "zst.pu.t.36": {
+    "name": "36",
+    "locoNetId": 36,
+    "home": 1,
+    "SVGData": {
+      "x": 1650,
+      "y": 0,
+      "rotate": 0,
+      "dir": "P"
+    }
+  },
+  "zst.pu.t.37": {
+    "name": "37",
+    "locoNetId": 37,
+    "home": 1,
+    "SVGData": {
+      "x": 1700,
+      "y": 60,
+      "rotate": 180,
+      "dir": "L"
+    }
+  },
+  "zst.pu.t.38": {
+    "name": "38",
+    "locoNetId": 38,
+    "home": 1,
+    "SVGData": {
+      "x": 1750,
+      "y": 60,
+      "rotate": 0,
+      "dir": "P"
+    }
+  },
+  "zst.pu.t.40": {
+    "name": "40",
+    "locoNetId": 40,
+    "home": 1,
+    "SVGData": {
+      "x": 1775,
+      "y": 60,
+      "rotate": 0,
+      "dir": "L"
+    }
+  },
+  "zst.pu.t.41": {
+    "name": "41",
+    "locoNetId": 41,
+    "home": 1,
+    "SVGData": {
+      "x": 1700,
+      "y": 30,
+      "rotate": 180,
+      "dir": "P"
+    }
+  },
+  "zst.pu.t.42": {
+    "name": "42",
+    "locoNetId": 42,
+    "home": 1,
+    "SVGData": {
+      "x": 1825,
+      "y": 30,
+      "rotate": 180,
+      "dir": "L"
+    }
+  },
+  "zst.pu.t.43": {
+    "name": "43",
+    "locoNetId": 43,
+    "home": 1,
+    "SVGData": {
+      "x": 1850,
+      "y": 30,
+      "rotate": 0,
+      "dir": "L"
+    }
+  },
+  "zst.pu.t.44": {
+    "name": "44",
+    "locoNetId": 44,
+    "home": 1,
+    "SVGData": {
+      "x": 1900,
+      "y": 0,
+      "rotate": 180,
+      "dir": "L"
+    }
+  }
+}

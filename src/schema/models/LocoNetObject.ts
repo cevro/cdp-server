@@ -3,9 +3,9 @@ import {
     LocoNetReceiver,
 } from 'app/schema/services/DateReceiver';
 import { Message, METHOD_TYPE } from '@definitions/messages';
-import { logger } from 'app/webSocetServer';
+import { webSocketServer } from 'app/server/webSocketServer';
 
-abstract class LocoNetObject<D> implements LocoNetReceiver {
+export default abstract class LocoNetObject<D> implements LocoNetReceiver {
 
     protected readonly locoNetId: number;
     private readonly entityName: string;
@@ -24,7 +24,7 @@ abstract class LocoNetObject<D> implements LocoNetReceiver {
     }
 
     public sendState() {
-        logger.log<Message<D>>({
+        webSocketServer.log<Message<D>>({
             uri: this.getEntityName() + '/' + this.getLocoNetId(),
             method: 'patch',
             data: this.toObject(),
@@ -62,4 +62,3 @@ abstract class LocoNetObject<D> implements LocoNetReceiver {
     }
 }
 
-export default LocoNetObject;

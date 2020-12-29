@@ -1,13 +1,10 @@
-import {Message} from '@definitions/messages';
 import BiDirAB from '../models/autoBlock/BiDirAB';
-import LocoNetObjectsFactory from './LocoNetObjectsFactory';
-import {BiDirABState} from "app/consts/interfaces";
 
-class BiDirABsFactory extends LocoNetObjectsFactory<Message, BiDirABState> {
+class BiDirABsFactory /*extends LocoNetObjectsFactory<Message, BiDirABState> */ {
     private readonly biDirABs: BiDirAB[];
 
     constructor() {
-        super();
+        // super();
         this.biDirABs = [{locoNetId: 450}, {locoNetId: 451}].map((value) => {
             return new BiDirAB(value);
         });

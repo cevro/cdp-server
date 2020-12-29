@@ -1,39 +1,13 @@
 import {
     LocoNetMessage,
     LocoNetReceiver,
-    HttpReceiver,
 } from './DateReceiver';
 import { Message, METHOD_TYPE } from '@definitions/messages';
 import LocoNetObject from '../models/LocoNetObject';
 
-abstract class LocoNetObjectsFactory<M extends Message, D = any> implements HttpReceiver<M>, LocoNetReceiver {
+export default abstract class LocoNetObjectsFactory<M extends Message, D = any> implements LocoNetReceiver {
 
-    protected abstract getObjects(): /*LocoNetObject<D>*/any[];
-
-
-    public handlePatch(message: M): void {
-        return this.handle('patch', message);
-    }
-
-    public handleGet(message: M): void {
-        return this.handle('get', message);
-    }
-
-    public handlePost(message: M): void {
-        return this.handle('post', message);
-    }
-
-    public handleDelete(message: M): void {
-        return this.handle('delete', message);
-    }
-
-    private handle(method: METHOD_TYPE, message: M) {
-        this.getObjects().forEach((object) => {
-            if (this.matchMessage(message, object)) {
-                object.handle(method, message);
-            }
-        });
-    }
+    protected abstract getObjects(): LocoNetObject<D>[];
 
     protected matchMessage(message: M, object: LocoNetObject<D>): boolean {
         const match = message.uri.match(/([a-zA-Z_]+)\/([0-9]+)/);
@@ -61,6 +35,12 @@ abstract class LocoNetObjectsFactory<M extends Message, D = any> implements Http
         });
     }
 
-}
+    private handle(method: METHOD_TYPE, message: M) {
+        this.getObjects().forEach((object) => {
+            if (this.matchMessage(message, object)) {
+                object.handle(method, message);
+            }
+        });
+    }
 
-export default LocoNetObjectsFactory;
+}

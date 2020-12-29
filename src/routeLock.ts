@@ -1,16 +1,17 @@
-import TrainRoute from './TrainRoute';
 import { TrainRouteBufferItem } from '@definitions/interfaces';
 import { routesFactory } from 'app/schema/services/RoutesFactory';
+import Route from 'app/schema/models/route';
+import AspectStrategy from 'app/aspectStrategy';
 
-export default class TrainRouteLock {
-    public readonly buildOptions: any;
-    public reason: string;
+export default class RouteLock {
 
     public static readonly STATE_WAITING = 'waiting';
     public static readonly STATE_BUILDING = 'building';
     public static readonly STATE_BUILT = 'built';
+    public readonly buildOptions: any;
+    public reason: string;
 
-    public readonly route: TrainRoute;
+    public readonly route: Route;
 
     private readonly id: number;
     private _state: string;
@@ -18,7 +19,7 @@ export default class TrainRouteLock {
     constructor(routeId: number, buildOptions: any) {
         this.route = routesFactory.findById(routeId);
         this.id = (new Date()).getTime();
-        this.state = TrainRouteLock.STATE_WAITING;
+        this.state = RouteLock.STATE_WAITING;
         this.buildOptions = buildOptions;
         /*  logger.log({
               date: new Date(),
@@ -90,13 +91,13 @@ export default class TrainRouteLock {
     public async build(routeBuilder: any) {
 
         const trainRoute = this.route;
-        this.state = TrainRouteLock.STATE_BUILDING;
+        this.state = RouteLock.STATE_BUILDING;
         routeBuilder.printBuffer();
         try {
             const pointPositions = trainRoute.turnoutPositions;
             for (const id in pointPositions) {
                 const pointPosition = pointPositions[id];
-                //await pointPosition.lock(this.getId());
+                // await pointPosition.lock(this.getId());
             }
 
             const sectors = trainRoute.getSectors();
@@ -104,13 +105,17 @@ export default class TrainRouteLock {
                 const sector = sectors[id];
                 sector.lock(this.getId());
             }
-            trainRoute.recalculateSignal(this.buildOptions);
+            trainRoute.startSignal.requestChange(AspectStrategy.calculate(this));
 
-            this.state = TrainRouteLock.STATE_BUILT;
+            this.state = RouteLock.STATE_BUILT;
             routeBuilder.printBuffer();
         } catch (e) {
-            this.rollBack();
+            await this.rollBack();
         }
+    }
+
+    public refresh() {
+        this.route.startSignal.requestChange(AspectStrategy.calculate(this));
     }
 
     public async rollBack() {

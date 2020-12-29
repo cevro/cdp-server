@@ -1,15 +1,15 @@
-import Signal from '../Signal';
-import { TurnoutPositionDef } from '../Turnout/turnoutPosition';
-import Sector from '../Sectors/Sector';
+import ModelSignal from './modelSignal';
+import { TurnoutPositionDef } from './turnoutPosition';
+import Sector from './sector';
 import { TrainRouteDefinition } from 'app/data/puchov/routes/1L';
-import { BuildOptions } from '@definitions/interfaces';
 import { RequestedTurnoutPosition } from 'app/consts/turnouts';
-import TrackApproval from 'app/schema/models/Routes/TrackApproval';
-import { signalFactory } from 'app/schema/services/signalService';
-import { sectorFactory } from 'app/schema/services/SectorsFactory';
-import { SignalStrategy } from 'app/schema/services/SignalStrategy';
+import TrackApproval from 'app/schema/models/trackApproval';
+import { signalService } from 'app/schema/services/signalService';
+import { sectorFactory } from 'app/schema/services/sectorService';
+import AspectStrategy from 'app/aspectStrategy';
+import RouteLock from 'app/routeLock';
 
-export default class TrainRoute {
+export default class Route {
     public id;
     public name: string;
 
@@ -19,8 +19,8 @@ export default class TrainRoute {
         approval: TrackApproval;
         position: RequestedTurnoutPosition;
     }>;
-    public startSignal: Signal;
-    public endSignal: Signal;
+    public startSignal: ModelSignal;
+    public endSignal: ModelSignal;
     // public trackApproval: TrackApproval;
 
     public readonly endSector: Sector;
@@ -37,9 +37,9 @@ export default class TrainRoute {
         this.name = def.name;
         this.turnoutPositions = def.turnoutPositions;
 
-        this.endSignal = def.endSignalId ? signalFactory.findById(def.endSignalId) : null;
+        this.endSignal = def.endSignalId ? signalService.findById(def.endSignalId) : null;
 
-        this.startSignal = signalFactory.findById(def.startSignalId);
+        this.startSignal = signalService.findById(def.startSignalId);
 
         this.endSector = sectorFactory.findById(def.endSectorId);
         this.speed = def.speed;
@@ -53,8 +53,8 @@ export default class TrainRoute {
     public alock() {
     }
 
-    public recalculateSignal(buildOptions: BuildOptions): void {
-        this.startSignal.requestChange(SignalStrategy.calculate(this.endSignal, this.speed, this.sufficientDistance, buildOptions));
+    public recalculateSignal(routeLock: RouteLock): void {
+        this.startSignal.requestChange(AspectStrategy.calculate(routeLock));
     }
 
 }

@@ -2,19 +2,19 @@ import {
     TrainRouteBufferItem,
     TrainRouteDump,
 } from '@definitions/interfaces';
-import TrainRouteLock from '../models/Routes/TrainRouteLock';
 import {
     LocoNetMessage,
 } from './DateReceiver';
 import { Message } from '@definitions/messages';
-import { SignalStrategy } from 'app/schema/services/SignalStrategy';
-import { STATUS_BUSY } from 'app/schema/models/Sectors/Sector';
+import RouteLock from 'app/routeLock';
+import { Aspects } from 'app/aspects';
+import { STATUS_BUSY } from '../models/sector';
 
 class RouteBuilder /*extends LocoNetObject<TrainRouteDump> */ {
 
     private _locked: boolean = false;
 
-    private buffer: TrainRouteLock[] = [];
+    private buffer: RouteLock[] = [];
 
     private hasError: boolean;
 
@@ -22,20 +22,11 @@ class RouteBuilder /*extends LocoNetObject<TrainRouteDump> */ {
         //   super(0, 'route-builder');
     }
 
-    public addToBuffer(trainRouteId: number, buildOptions: any): void {
-        const routeLock = new TrainRouteLock(trainRouteId, buildOptions);
+    public async addToBuffer(trainRouteId: number, buildOptions: any): Promise<void> {
+        const routeLock = new RouteLock(trainRouteId, buildOptions);
         this.buffer.push(routeLock);
         this.printBuffer();
-        this.tryBuild();
-    }
-
-    private get locked(): boolean {
-        return this._locked;
-    }
-
-    private set locked(value: boolean) {
-        this._locked = value;
-        this.printBuffer();
+        await this.tryBuild();
     }
 
     public printBuffer(): void {
@@ -56,7 +47,7 @@ class RouteBuilder /*extends LocoNetObject<TrainRouteDump> */ {
         }
     }
 
-    public handleMessageReceive(message: Message): void {
+    public async handleMessageReceive(message: Message): Promise<void> {
         /*   switch (message.action) {
                case 'build':
                    this.addToBuffer(message.data.id, message.data.buildOptions);
@@ -64,7 +55,7 @@ class RouteBuilder /*extends LocoNetObject<TrainRouteDump> */ {
            }*/
 
         this.refreshRoutes();
-        this.tryBuild();
+        await this.tryBuild();
     }
 
     public toObject(): TrainRouteDump {
@@ -75,11 +66,11 @@ class RouteBuilder /*extends LocoNetObject<TrainRouteDump> */ {
         // builder is server-side no LN comunication needed
     }
 
-    public destroyRoute(locker: TrainRouteLock) {
-        locker.destroyRoute();
+    public destroyRoute(routeLock: RouteLock) {
+        routeLock.destroyRoute();
 
         this.buffer = this.buffer.filter((bufferLock) => {
-            return locker.getId() !== bufferLock.getId();
+            return routeLock.getId() !== bufferLock.getId();
         });
         this.printBuffer();
     }
@@ -100,7 +91,16 @@ class RouteBuilder /*extends LocoNetObject<TrainRouteDump> */ {
         }
     }
 
-    private async build(routeLock: TrainRouteLock) {
+    private get locked(): boolean {
+        return this._locked;
+    }
+
+    private set locked(value: boolean) {
+        this._locked = value;
+        this.printBuffer();
+    }
+
+    private async build(routeLock: RouteLock) {
         if (this.hasError) {
             return;
         }
@@ -129,12 +129,12 @@ class RouteBuilder /*extends LocoNetObject<TrainRouteDump> */ {
         this.locked = false;
 
         this.refreshRoutes();
-        this.tryBuild();
+        await this.tryBuild();
     }
 
-    private findFirstNotBuiltRoute(): TrainRouteLock {
+    private findFirstNotBuiltRoute(): RouteLock {
         const routes = this.buffer.filter((lock) => {
-            return lock.state === TrainRouteLock.STATE_WAITING;
+            return lock.state === RouteLock.STATE_WAITING;
         });
         if (routes.length) {
             return routes[0];
@@ -142,28 +142,29 @@ class RouteBuilder /*extends LocoNetObject<TrainRouteDump> */ {
         return null;
     }
 
-    private refreshRoute(locker: TrainRouteLock) {
-        if (locker.state !== TrainRouteLock.STATE_BUILT) {
+    private refreshRoute(routeLock: RouteLock) {
+        if (routeLock.state !== RouteLock.STATE_BUILT) {
             return;
         }
-        const trainRoute = locker.route;
+        const trainRoute = routeLock.route;
         if (this.hasError) {
-            trainRoute.startSignal.requestChange(SignalStrategy.NAVEST_STOJ);
+            trainRoute.startSignal.requestChange(Aspects.ASPECT_STOP);
             return;
         }
 
-        const sectors = locker.route.getSectors();
+        const sectors = routeLock.route.getSectors();
 
         let isFree = true;
         for (const id in sectors) {
             const sector = sectors[id];
-            isFree = isFree && sector.isFreeAndAllocated(locker.getId());
+            isFree = isFree && sector.isFreeAndAllocated(routeLock.getId());
         }
         if (isFree) {
-            trainRoute.recalculateSignal(locker.buildOptions);
+            routeLock.refresh();
+            routeLock.route.recalculateSignal(routeLock);
             return;
         } else {
-            locker.route.startSignal.requestChange(SignalStrategy.NAVEST_STOJ);
+            routeLock.route.startSignal.requestChange(Aspects.ASPECT_STOP);
 
             let busyIndex = 0;
             for (const index in sectors) {
@@ -190,11 +191,11 @@ class RouteBuilder /*extends LocoNetObject<TrainRouteDump> */ {
             }*/
             const unalockIndex = busyIndex - 1;
             if (sectors.hasOwnProperty(unalockIndex)) {
-                if (sectors[unalockIndex].locked === locker.getId()) {
-                    locker.route.turnoutPositions.forEach((pointPosition) => {
-                        //pointPosition.unlockBySector(locker.getId(), sectors[unalockIndex].getLocoNetId());
+                if (sectors[unalockIndex].locked === routeLock.getId()) {
+                    routeLock.route.turnoutPositions.forEach((pointPosition) => {
+                        // pointPosition.unlockBySector(locker.getId(), sectors[unalockIndex].getLocoNetId());
                     });
-                    sectors[unalockIndex].unlock(locker.getId());
+                    sectors[unalockIndex].unlock(routeLock.getId());
                 }
             }
         }

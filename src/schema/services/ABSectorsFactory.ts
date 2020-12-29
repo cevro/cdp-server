@@ -1,14 +1,12 @@
 import ABSector from '../models/autoBlock/autoBlockSector';
-import {ABSectors} from '@definitions/ABSectors/ABSectors';
-import LocoNetObjectsFactory from './LocoNetObjectsFactory';
-import {ABSectorState, LocoNetDefinition} from '@definitions/interfaces';
-import {Message} from "app/consts/messages";
+import { ABSectors } from '@definitions/ABSectors/ABSectors';
+import { LocoNetDefinition } from '@definitions/interfaces';
 
-class ABSectorsFactory extends LocoNetObjectsFactory<Message, ABSectorState> {
+class ABSectorsFactory /*extends LocoNetObjectsFactory<Message, ABSectorState> */ {
     private readonly ABSectors: ABSector[];
 
     constructor() {
-        super();
+        // super();
         this.ABSectors = ABSectors.map((value: LocoNetDefinition) => {
             return new ABSector(value);
         });

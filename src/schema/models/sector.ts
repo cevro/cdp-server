@@ -2,7 +2,7 @@ import { SectorState } from '@definitions/interfaces';
 import { SectorBackEndDefinition } from 'app/data/sectors';
 import { Message } from '@definitions/messages';
 import { LocoNetMessage } from 'app/schema/services/DateReceiver';
-import { locoNetConnector } from 'app/inc/SerialConnector/SerialConnector';
+import { locoNetConnector } from 'app/serialConnector/';
 
 export const STATUS_BUSY = 2;
 export const STATUS_FREE = 1;
@@ -13,7 +13,7 @@ export default class Sector /*extends LocoNetObject<SectorState>*/ {
     private _state: number;
 
     constructor(definition: SectorBackEndDefinition) {
-        //super(definition.locoNetId, ENTITY_SECTOR);
+        // super(definition.locoNetId, ENTITY_SECTOR);
         this._locked = null;
         this._state = STATUS_UNDEFINED;
 
@@ -24,7 +24,7 @@ export default class Sector /*extends LocoNetObject<SectorState>*/ {
             return;
         }
         this._state = value;
-        //this.sendState();
+        // this.sendState();
     }
 
     get state(): number {
@@ -33,7 +33,7 @@ export default class Sector /*extends LocoNetObject<SectorState>*/ {
 
     set locked(value: number) {
         this._locked = value;
-        //this.sendState();
+        // this.sendState();
     }
 
     get locked(): number {
@@ -70,7 +70,7 @@ export default class Sector /*extends LocoNetObject<SectorState>*/ {
     public toObject(): SectorState {
         return {
             state: this.state,
-            locoNetId: 1,//this.locoNetId,
+            locoNetId: 1,// this.locoNetId,
             locked: this.locked,
         };
     }

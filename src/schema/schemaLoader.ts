@@ -1,22 +1,18 @@
 import * as mysql from 'mysql';
-import { signalFactory } from 'app/schema/services/signalService';
+import { signalService } from 'app/schema/services/signalService';
+import { config } from 'app/config.local';
 
 class SchemaLoader {
 
     private readonly connection: mysql.Connection;
 
     constructor() {
-        this.connection = mysql.createConnection({
-            host: 'localhost',
-            user: 'root',
-            password: '',
-            database: 'cdp_scheme',
-        });
+        this.connection = mysql.createConnection(config.schemaDatabase);
     }
 
-    public load(): void {
+    public async load(): Promise<void> {
         this.connection.connect();
-        signalFactory.loadSchema(this.connection);
+        await signalService.loadSchema(this.connection);
 
         this.connection.end();
     }

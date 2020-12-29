@@ -2,7 +2,7 @@ import { Message } from '@definitions/messages';
 import { RequestedTurnoutPosition, TurnoutDefinition, TurnoutPosition } from 'app/consts/turnouts';
 import { TurnoutState } from 'app/consts/interfaces';
 import { PointLockedError } from 'app/inc/Exceptions/Errors';
-import { locoNetConnector } from 'app/inc/SerialConnector/SerialConnector';
+import { locoNetConnector } from 'app/serialConnector/';
 import { LocoNetMessage } from 'app/schema/services/DateReceiver';
 
 export default class Turnout /* extends LocoNetObject<TurnoutState> */ {
@@ -13,7 +13,7 @@ export default class Turnout /* extends LocoNetObject<TurnoutState> */ {
     private lockedBy: number[] = [];
 
     constructor(definition: TurnoutDefinition) {
-        //super(definition.locoNetId, 'turnout');
+        // super(definition.locoNetId, 'turnout');
 
         this._position = 0;
         this.sector = definition.sector;
@@ -74,11 +74,11 @@ export default class Turnout /* extends LocoNetObject<TurnoutState> */ {
     public handleLocoNetReceive(message: LocoNetMessage): void {
     }
 
-    handlePatch(message: Message): void {
+    public handlePatch(message: Message): void {
         if (message.data.hasOwnProperty('requestedPosition')) {
             this.handleChangePositionRequest(message.data.requestedPosition);
         }
-        //super.handlePatch(message);
+        // super.handlePatch(message);
     }
 
     private changePosition(position: RequestedTurnoutPosition) {

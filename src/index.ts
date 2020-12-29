@@ -1,11 +1,14 @@
 import { schemaLoader } from 'app/schema/schemaLoader';
-import { logger } from 'app/webSocetServer';
+import { webSocketServer } from 'app/server/webSocketServer';
+import { restServer } from 'app/server/restServer';
 
 class Main {
 
     public async run() {
-        schemaLoader.load();
-        logger.run();
+        await schemaLoader.load();
+        webSocketServer.run();
+        restServer.run();
+
 
         //  locoNetConnector.registerListener(autoBlockSectorFactory);
         //    locoNetConnector.registerListener(signalFactory);

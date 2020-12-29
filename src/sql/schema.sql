@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS `signal`
 (
     `signal_id`       INT            NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    `signal_uid`      VARCHAR(16)    NOT NULL,
+    `signal_uid`      VARCHAR(64)    NOT NULL,
     `name`            VARCHAR(8)     NOT NULL,
     `loconet_id`      INT            NULL DEFAULT NULL,
     `type`            ENUM ('entry','exit','path','auto_block','shunt'),
@@ -12,9 +12,10 @@ CREATE TABLE IF NOT EXISTS `signal`
 
 CREATE TABLE IF NOT EXISTS `turnout`
 (
-    `turnout_id`       INT        NOT NULL PRIMARY KEY,
-    `name`             VARCHAR(8) NOT NULL,
-    `default_position` ENUM (1, -1)
+    `turnout_id`    INT            NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    `turnout_uid`   VARCHAR(64)    NOT NULL,
+    `name`          VARCHAR(8)     NOT NULL,
+    `base_position` ENUM ('S','D') NOT NULL # straight/diverging
 ) ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS `route`

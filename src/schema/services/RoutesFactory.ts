@@ -1,4 +1,4 @@
-import TrainRoute from '../models/Routes/TrainRoute';
+import TrainRoute from '../models/route';
 import {Message} from '@definitions/messages';
 import {RouteFinderRequest} from '@definitions/interfaces';
 
@@ -23,7 +23,7 @@ class RoutesFactory/* implements HttpReceiver<Message>*/ {
 
     public findRoute(startSignalId: number, endSectorId: number): TrainRoute[] {
         return this.routes.filter((route) => {
-            return (route.startSignal.getLocoNetId() === startSignalId) && (route.endSector.getLocoNetId() === endSectorId);
+         //   return (route.startSignal.getLocoNetId() === startSignalId) && (route.endSector.getLocoNetId() === endSectorId);
         });
     }
 

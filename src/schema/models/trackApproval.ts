@@ -1,14 +1,14 @@
-import BiDirAutoBlock from '../autoBlock/BiDirAB';
 import {
     ABRequestedDir,
 } from '@definitions/interfaces';
 import { Message } from '@definitions/messages';
 import { LocoNetMessage, LocoNetReceiver } from 'app/schema/services/DateReceiver';
+import BiDirAB from 'app/schema/models/autoBlock/BiDirAB';
 
 export default class TrackApproval implements LocoNetReceiver/*, HttpReceiver<Message<any>>*/ {
 
     private readonly locoNetId: number;
-    private biDirAB: BiDirAutoBlock;
+    private biDirAB: BiDirAB;
     private readonly dir: ABRequestedDir;
     private locked: boolean;
     private readonly ABId: number;
