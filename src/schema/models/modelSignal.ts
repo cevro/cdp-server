@@ -1,6 +1,6 @@
-import { LocoNetMessage } from 'app/schema/services/DateReceiver';
-import { webSocketServer } from 'app/server/webSocketServer';
+import { LocoNetMessage } from 'app/inc/DateReceiver';
 import { ENTITY_SIGNAL } from 'app/consts/entity';
+import AbstractModel from 'app/schema/models/abstractModel';
 
 interface QueryRow {
     signal_id: number;
@@ -13,7 +13,7 @@ interface QueryRow {
     lights: string;
 }
 
-export default class ModelSignal /*extends LocoNetObject<SignalState>*/ implements Signal.State {
+export default class ModelSignal extends AbstractModel<Signal.State> implements Signal.State {
 
     public readonly signalId: number;
     public readonly signalUId: string;
@@ -29,6 +29,7 @@ export default class ModelSignal /*extends LocoNetObject<SignalState>*/ implemen
     public requestedAspect: number;
 
     public constructor(row: QueryRow) {
+        super(ENTITY_SIGNAL);
         this.signalId = row.signal_id;
         this.signalUId = row.signal_uid;
         this.name = row.name;
@@ -59,7 +60,7 @@ export default class ModelSignal /*extends LocoNetObject<SignalState>*/ implemen
             return;
         }
         this.requestedAspect = aspect;
-        this.logChange();
+        this.emit('change');
         setTimeout(() => {
             this.confirmChange(aspect);
         }, 2000);
@@ -85,20 +86,20 @@ export default class ModelSignal /*extends LocoNetObject<SignalState>*/ implemen
         };
     }
 
+    public getPrimary(): number {
+        return this.signalId;
+    }
+
+    public getUId(): string {
+        return this.signalUId;
+    }
+
     private confirmChange(value: number) {
         if (value === this.displayAspect) {
             return;
         }
         this.displayAspect = value;
-        this.logChange();
-    }
-
-    private logChange() {
-        webSocketServer.logChange({
-            data: {
-                [ENTITY_SIGNAL]: [this.toArray()],
-            },
-        });
+        this.emit('change');
     }
 }
 

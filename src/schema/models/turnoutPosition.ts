@@ -1,15 +1,19 @@
-import Turnout from './turnout';
+import ModelTurnout from './modelTurnout';
 import { RequestedTurnoutPosition } from 'app/consts/turnouts';
-import { turnoutsService } from 'app/schema/services/turnoutsService';
+import TurnoutService from 'app/schema/services/turnoutService';
 
 export interface TurnoutPositionDef {
-    turnout: Turnout;
+    turnout: ModelTurnout;
     position: RequestedTurnoutPosition;
 }
 
 export default class TurnoutPosition {
+    private turnoutService: TurnoutService;
 
-    public static create(id: number, position: RequestedTurnoutPosition): TurnoutPositionDef {
-        return {turnout: turnoutsService.findById(id), position: position};
+    constructor(turnoutService: TurnoutService) {
+    }
+
+    public create(id: number, position: RequestedTurnoutPosition): TurnoutPositionDef {
+        return {turnout: this.turnoutService.findById(id), position: position};
     }
 }

@@ -4,45 +4,36 @@ import {
 } from 'websocket';
 import { Message, WebSocketStateUpdateMessage } from '@definitions/messages';
 import * as http from 'http';
-import { ENTITY_AB_SECTOR, ENTITY_BI_DIR_AB, ENTITY_SECTOR, ENTITY_SIGNAL, ENTITY_TURNOUT } from '@definitions/entity';
-import { signalService } from 'app/schema/services/signalService';
 
-const httpServer = http.createServer((request, response) => {
-    // console.log((new Date()) + ' Received request for ' + request.url);
-    response.writeHead(404);
-    response.end();
-});
-
-httpServer.listen(8081, () => {
-    // console.log((new Date()) + ' Server is listening on port 8081');
-});
-const initClient = (connection: connection) => {
-    const message: WebSocketStateUpdateMessage = {
-        data: {
-            [ENTITY_SIGNAL]: signalService.signals.map((signal) => {
-                return signal.toArray();
-            }),
-            // [ENTITY_SECTOR]: sectorFactory.dump(),
-            // [ENTITY_TURNOUT]: turnoutsService.dump(),
-            // routeBuilder: routeBuilder.dumpBuffer(),
-            // [ENTITY_AB_SECTOR]: autoBlockSectorFactory.dump(),
-            // [ENTITY_BI_DIR_AB]: biDirAutoBlockFactory.dump(),
-        },
-    };
-    connection.send(JSON.stringify(message));
-};
-
-export const webSocketServer = new class {
+export class WebSocketServer {
     private wsServer: server;
+    private initialCallback: (connection: connection) => void;
 
-    public run() {
+    constructor() {
+        const httpServer = http.createServer((request, response) => {
+            // console.log((new Date()) + ' Received request for ' + request.url);
+            response.writeHead(404);
+            response.end();
+        });
+
+        httpServer.listen(8081, () => {
+            // console.log((new Date()) + ' Server is listening on port 8081');
+        });
         this.wsServer = new server({
             httpServer: httpServer,
             autoAcceptConnections: false,
         });
+
+    }
+
+    public setInitialCallBack(callback: (connection: connection) => void) {
+        this.initialCallback = callback;
+    }
+
+    public run() {
         this.wsServer.on('request', (request) => {
             const connection = request.accept('echo-protocol', request.origin);
-            initClient(connection);
+            this.initialCallback(connection);
         });
     }
 
@@ -53,5 +44,4 @@ export const webSocketServer = new class {
     public logChange(message: WebSocketStateUpdateMessage): void {
         this.wsServer.broadcast(JSON.stringify(message));
     }
-};
-
+}

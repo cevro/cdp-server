@@ -1,30 +1,25 @@
-import Sector from '../models/sector';
+import ModelSector from '../models/modelSector';
 import { sectors } from 'app/data/sectors';
+import AbstractService from 'app/schema/services/abstractService';
+import { Connection } from 'mysql';
 
-class SectorService/* extends LocoNetObjectsFactory<Message>*/ {
+export default class SectorService extends AbstractService<ModelSector> {
 
-    private readonly sectors: Sector[];
+    private readonly sectors: ModelSector[];
 
     constructor() {
-      //  super();
+        super();
         this.sectors = sectors.map(value => {
-            return new Sector(value);
+            return new ModelSector(value);
         });
     }
 
-    public findById(id: number): Sector {
-        for (const index in this.sectors) {
-            if (this.sectors.hasOwnProperty(index)) {
-                //   if (this.sectors[index].getLocoNetId() === id) {
-                //      return this.sectors[index];
-                // }
-            }
-        }
-        throw new Error();
+    public getAll(): ModelSector[] {
+        return this.sectors;
     }
 
-    protected getObjects(): Sector[] {
-        return this.sectors;
+    public loadSchema(connection: Connection): Promise<void> {
+        return Promise.resolve(undefined);
     }
 }
 

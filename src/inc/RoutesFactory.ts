@@ -1,15 +1,16 @@
-import TrainRoute from '../models/route';
-import {Message} from '@definitions/messages';
-import {RouteFinderRequest} from '@definitions/interfaces';
+import { Message } from '@definitions/messages';
+import { RouteFinderRequest } from '@definitions/interfaces';
+import Route from 'app/schema/models/route';
 
 class RoutesFactory/* implements HttpReceiver<Message>*/ {
-    private readonly routes: TrainRoute[];
+    private readonly routes: Route[];
 
     constructor() {
-        this.routes = /*routes*/[].map((def) => {
-            return new TrainRoute(def);
-        });
+        this.routes = []// /*routes*/[].map((def) => {
+        // return new Route(def);
+        //  });
     }
+
     /*
     public handleMessageReceive(message: Message): void {
         if (message.entity !== 'route-finder') {
@@ -21,13 +22,13 @@ class RoutesFactory/* implements HttpReceiver<Message>*/ {
         }
     }*/
 
-    public findRoute(startSignalId: number, endSectorId: number): TrainRoute[] {
+    public findRoute(startSignalId: number, endSectorId: number): Route[] {
         return this.routes.filter((route) => {
-         //   return (route.startSignal.getLocoNetId() === startSignalId) && (route.endSector.getLocoNetId() === endSectorId);
+            //   return (route.startSignal.getLocoNetId() === startSignalId) && (route.endSector.getLocoNetId() === endSectorId);
         });
     }
 
-    public findById(id: number): TrainRoute {
+    public findById(id: number): Route {
         for (const i in this.routes) {
             if (id === this.routes[i].id) {
                 return this.routes[i];
@@ -39,13 +40,13 @@ class RoutesFactory/* implements HttpReceiver<Message>*/ {
     private handelFindRoute(message: Message<{ startSignalId: number, endSectorId: number }>): void {
         const data: RouteFinderRequest = message.data;
         const routes = this.findRoute(data.startSignalId, data.endSectorId);
-     /*   logger.log({
-            date: new Date(),
-            id: 0,
-            entity: 'route-finder',
-            action: 'found',
-            data: {routes},
-        });*/
+        /*   logger.log({
+               date: new Date(),
+               id: 0,
+               entity: 'route-finder',
+               action: 'found',
+               data: {routes},
+           });*/
     }
 
 }

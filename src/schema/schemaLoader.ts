@@ -1,21 +1,17 @@
-import * as mysql from 'mysql';
-import { signalService } from 'app/schema/services/signalService';
-import { config } from 'app/config.local';
 
-class SchemaLoader {
+import { WebSocketServer } from 'app/server/webSocketServer';
+import { WebSocketStateUpdateMessage } from 'app/consts/messages';
+import { connection } from 'websocket';
+import AbstractService from 'app/schema/services/abstractService';
 
-    private readonly connection: mysql.Connection;
+export default class SchemaLoader {
+    private readonly services: AbstractService<any>[];
 
-    constructor() {
-        this.connection = mysql.createConnection(config.schemaDatabase);
+    constructor(services: AbstractService<any>[]) {
+        this.services = services;
     }
 
-    public async load(): Promise<void> {
-        this.connection.connect();
-        await signalService.loadSchema(this.connection);
+    public async load(webSocketServer: WebSocketServer): Promise<void> {
 
-        this.connection.end();
     }
 }
-
-export const schemaLoader = new SchemaLoader();

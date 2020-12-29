@@ -1,7 +1,4 @@
-import { locoNetConnector } from 'app/serialConnector/';
-import { Message } from '@definitions/messages';
 import { ABSectorState } from 'app/consts/interfaces';
-import { LocoNetMessage } from 'app/schema/services/DateReceiver';
 
 export default class AutoBlockSector /*extends LocoNetObject<ABSectorState> */ {
     private _error: number;
@@ -61,7 +58,7 @@ export default class AutoBlockSector /*extends LocoNetObject<ABSectorState> */ {
             active: this.active,
         };
     }
-
+/*
     public handleLocoNetReceive(data: LocoNetMessage): void {
         switch (data.type) {
             case 'e':
@@ -80,23 +77,5 @@ export default class AutoBlockSector /*extends LocoNetObject<ABSectorState> */ {
                 break;
         }
         // console.log(this);
-    }
-
-    public handlePatch(message: Message): void {
-        if (message.data.hasOwnProperty('blockCondition')) {
-            locoNetConnector.send({
-                locoNetId: 1,// this.locoNetId,
-                type: 'c',
-                value: message.data.blockCondition,
-            });
-        }
-        if (message.data.hasOwnProperty('error')) {
-            locoNetConnector.send({
-                locoNetId: 1,// this.locoNetId,
-                type: 'e',
-                value: message.data.error,
-            });
-        }
-        //    super.handlePatch(message);
-    }
+    }*/
 }

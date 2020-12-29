@@ -1,18 +1,20 @@
-import { SectorState } from '@definitions/interfaces';
 import { SectorBackEndDefinition } from 'app/data/sectors';
 import { Message } from '@definitions/messages';
-import { LocoNetMessage } from 'app/schema/services/DateReceiver';
 import { locoNetConnector } from 'app/serialConnector/';
+import AbstractModel from 'app/schema/models/abstractModel';
+import { ENTITY_SECTOR } from 'app/consts/entity';
 
 export const STATUS_BUSY = 2;
 export const STATUS_FREE = 1;
 export const STATUS_UNDEFINED = -1;
 
-export default class Sector /*extends LocoNetObject<SectorState>*/ {
+export default class ModelSector extends AbstractModel<any> {
+
     private _locked: number;
     private _state: number;
 
     constructor(definition: SectorBackEndDefinition) {
+        super(ENTITY_SECTOR);
         // super(definition.locoNetId, ENTITY_SECTOR);
         this._locked = null;
         this._state = STATUS_UNDEFINED;
@@ -67,27 +69,24 @@ export default class Sector /*extends LocoNetObject<SectorState>*/ {
         return (this.state === STATUS_FREE) && (this.locked === id);
     }
 
-    public toObject(): SectorState {
-        return {
-            state: this.state,
-            locoNetId: 1,// this.locoNetId,
-            locked: this.locked,
-        };
-    }
-
-    public handleLocoNetReceive(data: LocoNetMessage) {
-        switch (data.type) {
-            case 's':
-                this.state = data.value;
-        }
-    }
-
     public handlePatch(message: Message) {
         locoNetConnector.send({
             locoNetId: 1,// this.locoNetId,
             type: 's',
             value: message.data.state,
         });
+    }
+
+    public getPrimary(): number {
+        throw new Error('Method not implemented.');
+    }
+
+    public getUId(): string {
+        throw new Error('Method not implemented.');
+    }
+
+    public toArray() {
+        throw new Error('Method not implemented.');
     }
 }
 

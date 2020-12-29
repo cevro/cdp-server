@@ -2,7 +2,7 @@ import {
     ABRequestedDir,
 } from '@definitions/interfaces';
 import { Message } from '@definitions/messages';
-import { LocoNetMessage, LocoNetReceiver } from 'app/schema/services/DateReceiver';
+import { LocoNetMessage, LocoNetReceiver } from 'app/inc/DateReceiver';
 import BiDirAB from 'app/schema/models/autoBlock/BiDirAB';
 
 export default class TrackApproval implements LocoNetReceiver/*, HttpReceiver<Message<any>>*/ {

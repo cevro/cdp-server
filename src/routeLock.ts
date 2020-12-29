@@ -1,5 +1,5 @@
 import { TrainRouteBufferItem } from '@definitions/interfaces';
-import { routesFactory } from 'app/schema/services/RoutesFactory';
+import { routesFactory } from 'app/inc/RoutesFactory';
 import Route from 'app/schema/models/route';
 import AspectStrategy from 'app/aspectStrategy';
 

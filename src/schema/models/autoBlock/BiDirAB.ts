@@ -1,4 +1,4 @@
-import { LocoNetMessage } from 'app/schema/services/DateReceiver';
+import { LocoNetMessage } from 'app/inc/DateReceiver';
 import { ABDir } from '@definitions/interfaces';
 import { locoNetConnector } from 'app/serialConnector/';
 import { Message } from '@definitions/messages';
@@ -29,22 +29,5 @@ export default class BiDirAB /*extends LocoNetObject<ABState>*/ {
             });
         }
         //  super.handlePatch(message);
-    }
-
-    public handleLocoNetReceive(data: LocoNetMessage): void {
-        switch (data.type) {
-            case 'd':
-                this.dir = (<ABDir>data.value);
-                // this.sendState();
-                return;
-        }
-        return;
-    }
-
-    public toObject(): ABState {
-        return {
-            dir: this.dir,
-            locoNetId: 1,//this.locoNetId,
-        }
     }
 }

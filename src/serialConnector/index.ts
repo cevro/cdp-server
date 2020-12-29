@@ -2,7 +2,7 @@ import * as SerialPort from 'serialport';
 import {
     LocoNetMessage,
     LocoNetReceiver,
-} from 'app/schema/services/DateReceiver';
+} from 'app/inc/DateReceiver';
 import { PortInfo } from 'serialport';
 
 class SerialConnector /*implements HttpReceiver<Message>*/ {

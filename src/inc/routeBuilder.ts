@@ -8,7 +8,7 @@ import {
 import { Message } from '@definitions/messages';
 import RouteLock from 'app/routeLock';
 import { Aspects } from 'app/aspects';
-import { STATUS_BUSY } from '../models/sector';
+import { STATUS_BUSY } from 'app/schema/models/modelSector';
 
 class RouteBuilder /*extends LocoNetObject<TrainRouteDump> */ {
 

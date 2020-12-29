@@ -1,19 +1,19 @@
 import ModelSignal from './modelSignal';
 import { TurnoutPositionDef } from './turnoutPosition';
-import Sector from './sector';
+import ModelSector from './modelSector';
 import { TrainRouteDefinition } from 'app/data/puchov/routes/1L';
 import { RequestedTurnoutPosition } from 'app/consts/turnouts';
 import TrackApproval from 'app/schema/models/trackApproval';
-import { signalService } from 'app/schema/services/signalService';
-import { sectorFactory } from 'app/schema/services/sectorService';
+import SectorService  from 'app/schema/services/sectorService';
 import AspectStrategy from 'app/aspectStrategy';
 import RouteLock from 'app/routeLock';
+import SignalService from 'app/schema/services/signalService';
 
 export default class Route {
     public id;
     public name: string;
 
-    public readonly sectors: Sector[];
+    public readonly sectors: ModelSector[];
     public readonly turnoutPositions: TurnoutPositionDef[];
     public readonly trackApprovals: Array<{
         approval: TrackApproval;
@@ -23,15 +23,15 @@ export default class Route {
     public endSignal: ModelSignal;
     // public trackApproval: TrackApproval;
 
-    public readonly endSector: Sector;
+    public readonly endSector: ModelSector;
 
     public readonly speed: number | null;
     public sufficientDistance: boolean;
 
-    constructor(def: TrainRouteDefinition) {
+    constructor(def: TrainRouteDefinition, signalService: SignalService, sectorService: SectorService) {
         this.id = def.id;
         this.sectors = def.sectorIds.map((id) => {
-            return sectorFactory.findById(id);
+            return sectorService.findById(id);
         });
 
         this.name = def.name;
@@ -41,12 +41,12 @@ export default class Route {
 
         this.startSignal = signalService.findById(def.startSignalId);
 
-        this.endSector = sectorFactory.findById(def.endSectorId);
+        this.endSector = sectorService.findById(def.endSectorId);
         this.speed = def.speed;
         this.sufficientDistance = def.sufficientDistance === undefined ? true : def.sufficientDistance;
     }
 
-    public getSectors(): Sector[] {
+    public getSectors(): ModelSector[] {
         return this.sectors;
     };
 
