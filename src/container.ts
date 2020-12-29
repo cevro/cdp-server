@@ -8,6 +8,7 @@ import AbstractService from 'app/schema/services/abstractService';
 import RestServer from 'app/server/restServer';
 import { WebSocketStateUpdateMessage } from 'app/consts/messages';
 import { connection } from 'websocket';
+import { BadRequestError, NotFoundError } from 'restify-errors';
 
 export default class Container {
     private signalService: SignalService = null;
@@ -61,6 +62,27 @@ export default class Container {
             );
         }
         return this.webSocketServer;
+    }
+
+    public async getRestServer(): Promise<RestServer> {
+        if (!this.restServer) {
+            this.restServer = new RestServer();
+            const signalService = await this.getSignalService();
+            this.restServer.server.post('/signal/:signalId', (req, response, next) => {
+                const signal = signalService.findById(req.params.signalId);
+                if (!signal) {
+                    return next(new NotFoundError('Signal ' + req.params.signalId + ' no found'));
+                }
+                const body = JSON.parse(req.body);
+                if (!body.hasOwnProperty('aspect')) {
+                    return next(new BadRequestError('Param aspect is not included'))
+                }
+                signal.requestChange(body.aspect);
+                response.send(JSON.stringify({message: 'Done'}));
+                next(false);
+            });
+        }
+        return this.restServer;
     }
 
     private async registerEntityService(service: AbstractService<any>) {
