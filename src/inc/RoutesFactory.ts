@@ -1,5 +1,3 @@
-import { Message } from '@definitions/messages';
-import { RouteFinderRequest } from '@definitions/interfaces';
 import Route from 'app/schema/models/route';
 
 class RoutesFactory/* implements HttpReceiver<Message>*/ {
@@ -35,18 +33,6 @@ class RoutesFactory/* implements HttpReceiver<Message>*/ {
             }
         }
         return null;
-    }
-
-    private handelFindRoute(message: Message<{ startSignalId: number, endSectorId: number }>): void {
-        const data: RouteFinderRequest = message.data;
-        const routes = this.findRoute(data.startSignalId, data.endSectorId);
-        /*   logger.log({
-               date: new Date(),
-               id: 0,
-               entity: 'route-finder',
-               action: 'found',
-               data: {routes},
-           });*/
     }
 
 }

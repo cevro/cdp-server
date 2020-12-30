@@ -1,26 +1,20 @@
 import { ENTITY_TURNOUT } from 'app/consts/entity';
 import AbstractModel from 'app/schema/models/abstractModel';
+import { BackendTurnout } from 'app/consts/interfaces';
 
-interface QueryRow {
-    turnout_id: number;
-    turnout_uid: string;
-    name: string;
-    base_position: Turnout.EndPosition;
-}
-
-export default class ModelTurnout extends AbstractModel<Turnout.State> implements Turnout.State {
+export default class ModelTurnout extends AbstractModel<BackendTurnout.Snapshot> {
 
     public readonly name: string;
     public readonly turnoutUId: string;
     public readonly turnoutId: number;
-    public readonly basePosition: Turnout.EndPosition;
+    public readonly basePosition: BackendTurnout.EndPosition;
 
-    public currentPosition: Turnout.Position = 'U';
-    public requestedPosition: Turnout.EndPosition | null = null;
+    public currentPosition: BackendTurnout.Position = 'U';
+    public requestedPosition: BackendTurnout.EndPosition | null = null;
 
     private lockedBy: number[] = [];
 
-    constructor(row: QueryRow) {
+    constructor(row: BackendTurnout.Row) {
         super(ENTITY_TURNOUT);
         this.name = row.name;
         this.turnoutId = row.turnout_id;
@@ -53,7 +47,7 @@ export default class ModelTurnout extends AbstractModel<Turnout.State> implement
             //    this.sendState();
         }
     */
-    public toArray(): Turnout.State {
+    public toArray(): BackendTurnout.Snapshot {
         return {
             name: this.name,
             turnoutId: this.turnoutId,
@@ -72,12 +66,12 @@ export default class ModelTurnout extends AbstractModel<Turnout.State> implement
         return this.turnoutUId;
     }
 
-    public changePosition(position: Turnout.EndPosition) {
+    public requestChange(position: BackendTurnout.EndPosition) {
         this.requestedPosition = position;
         this.emit('change');
         setTimeout(() => {
             this.confirmChange(position);
-        })
+        }, 4000);
         /* locoNetConnector.send({
              locoNetId: 1,// this.locoNetId,
              type: 's',
@@ -85,26 +79,11 @@ export default class ModelTurnout extends AbstractModel<Turnout.State> implement
          });*/
     }
 
-    private confirmChange(value: Turnout.EndPosition) {
+    private confirmChange(value: BackendTurnout.EndPosition) {
         if (value === this.currentPosition) {
             return;
         }
         this.currentPosition = value;
         this.emit('change');
     }
-}
-
-
-export namespace Turnout {
-    export interface State {
-        name: string;
-        turnoutUId: string;
-        turnoutId: number;
-        basePosition: EndPosition;
-        currentPosition: Turnout.Position;
-        requestedPosition: Turnout.EndPosition | null;
-    }
-
-    export type EndPosition = 'D' | 'S';
-    export type Position = EndPosition | 'U';
 }

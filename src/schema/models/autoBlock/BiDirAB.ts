@@ -1,7 +1,4 @@
-import { LocoNetMessage } from 'app/inc/DateReceiver';
 import { ABDir } from '@definitions/interfaces';
-import { locoNetConnector } from 'app/serialConnector/';
-import { Message } from '@definitions/messages';
 
 export interface ABState {
     dir: ABDir;
@@ -9,7 +6,7 @@ export interface ABState {
 }
 
 export default class BiDirAB /*extends LocoNetObject<ABState>*/ {
-    private dir: ABDir;
+    private readonly dir: ABDir;
 
     constructor(data: { locoNetId: number }) {
         //   super(data.locoNetId, ENTITY_BI_DIR_AB);
@@ -18,16 +15,5 @@ export default class BiDirAB /*extends LocoNetObject<ABState>*/ {
 
     public getDir(): ABDir {
         return this.dir;
-    }
-
-    public handlePatch(message: Message): void {
-        if (message.data.hasOwnProperty('dir')) {
-            return locoNetConnector.send({
-                locoNetId: 1,// this.locoNetId,
-                type: 'd',
-                value: message.data.dir,
-            });
-        }
-        //  super.handlePatch(message);
     }
 }

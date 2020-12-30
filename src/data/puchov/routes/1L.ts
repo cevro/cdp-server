@@ -169,9 +169,3 @@ export const routes3S: TrainRouteDefinition[] = [
         sufficientDistance: false,
     },
 ];
-
-export const routes: TrainRouteDefinition[] = [
-    ...routes1L,
-    ...routes3L,
-    ...routes3S,
-];

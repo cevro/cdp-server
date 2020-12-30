@@ -14,5 +14,4 @@ export default abstract class AbstractModel<S> extends EventEmitter {
     public abstract getUId(): string;
 
     public abstract toArray(): S;
-
 }

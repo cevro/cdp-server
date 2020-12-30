@@ -2,12 +2,13 @@ import ModelSignal from './modelSignal';
 import { TurnoutPositionDef } from './turnoutPosition';
 import ModelSector from './modelSector';
 import { TrainRouteDefinition } from 'app/data/puchov/routes/1L';
-import { RequestedTurnoutPosition } from 'app/consts/turnouts';
 import TrackApproval from 'app/schema/models/trackApproval';
-import SectorService  from 'app/schema/services/sectorService';
+import SectorService from 'app/schema/services/sectorService';
 import AspectStrategy from 'app/aspectStrategy';
 import RouteLock from 'app/routeLock';
 import SignalService from 'app/schema/services/signalService';
+import { BackendTurnout } from 'app/consts/interfaces';
+import EndPosition = BackendTurnout.EndPosition;
 
 export default class Route {
     public id;
@@ -17,7 +18,7 @@ export default class Route {
     public readonly turnoutPositions: TurnoutPositionDef[];
     public readonly trackApprovals: Array<{
         approval: TrackApproval;
-        position: RequestedTurnoutPosition;
+        position: EndPosition;
     }>;
     public startSignal: ModelSignal;
     public endSignal: ModelSignal;
@@ -50,8 +51,6 @@ export default class Route {
         return this.sectors;
     };
 
-    public alock() {
-    }
 
     public recalculateSignal(routeLock: RouteLock): void {
         this.startSignal.requestChange(AspectStrategy.calculate(routeLock));

@@ -18,6 +18,13 @@ CREATE TABLE IF NOT EXISTS `turnout`
     `base_position` ENUM ('S','D') NOT NULL # straight/diverging
 ) ENGINE = InnoDB;
 
+CREATE TABLE IF NOT EXISTS `sector`
+(
+    `sector_id`  INT         NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    `sector_uid` VARCHAR(64) NOT NULL,
+    `name`       VARCHAR(32) NULL DEFAULT NULL
+) ENGINE = InnoDB;
+
 CREATE TABLE IF NOT EXISTS `route`
 (
     `route_id`       INT        NOT NULL PRIMARY KEY,
@@ -40,11 +47,17 @@ CREATE TABLE IF NOT EXISTS `route`
 CREATE TABLE IF NOT EXISTS `turnout_position`
 (
     `turnout_position_id` INT NOT NULL PRIMARY KEY,
+    `route_id`            INT NOT NULL,
     `turnout_id`          INT NOT NULL,
-    `position`            ENUM (1, -1),
-    CONSTRAINT `fk_turnout_position`
+    `position`            ENUM ('S','D'),
+    CONSTRAINT `fk_turnout_position_turnout`
         FOREIGN KEY (`turnout_id`)
             REFERENCES `turnout` (`turnout_id`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION,
+    CONSTRAINT `fk_turnout_position_route`
+        FOREIGN KEY (`route_id`)
+            REFERENCES `route` (`route_id`)
             ON DELETE NO ACTION
             ON UPDATE NO ACTION
 

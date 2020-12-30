@@ -1,26 +1,17 @@
 import { LocoNetMessage } from 'app/inc/DateReceiver';
 import { ENTITY_SIGNAL } from 'app/consts/entity';
 import AbstractModel from 'app/schema/models/abstractModel';
+import { BackendSignal } from 'app/consts/interfaces';
 
-interface QueryRow {
-    signal_id: number;
-    signal_uid: string;
-    name: string;
-    loconet_id: number;
-    type: 'entry' | 'exit' | 'path' | 'auto_block' | 'shunt';
-    construction: 'T' | 'K' | null
-    last_auto_block: boolean;
-    lights: string;
-}
 
-export default class ModelSignal extends AbstractModel<Signal.State> implements Signal.State {
+export default class ModelSignal extends AbstractModel<BackendSignal.Snapshot>{
 
     public readonly signalId: number;
     public readonly signalUId: string;
     public readonly name: string;
-    public readonly type: Signal.Type;
-    public readonly construction: Signal.Construction;
-    public readonly lights: Signal.Light[];
+    public readonly type: BackendSignal.Type;
+    public readonly construction: BackendSignal.Construction;
+    public readonly lights: BackendSignal.Light[];
     public readonly spec: {
         lastAutoBlock: boolean;
     };
@@ -28,7 +19,7 @@ export default class ModelSignal extends AbstractModel<Signal.State> implements 
     public displayAspect: number;
     public requestedAspect: number;
 
-    public constructor(row: QueryRow) {
+    public constructor(row: BackendSignal.Row) {
         super(ENTITY_SIGNAL);
         this.signalId = row.signal_id;
         this.signalUId = row.signal_uid;
@@ -72,7 +63,7 @@ export default class ModelSignal extends AbstractModel<Signal.State> implements 
         //   this.sendState();
     }
 
-    public toArray(): Signal.State {
+    public toArray(): BackendSignal.Snapshot {
         return {
             signalId: this.signalId,
             signalUId: this.signalUId,
@@ -102,27 +93,3 @@ export default class ModelSignal extends AbstractModel<Signal.State> implements 
         this.emit('change');
     }
 }
-
-
-export namespace Signal {
-    export interface State {
-        displayAspect: number;
-        requestedAspect: number;
-        signalId: number;
-        signalUId: string;
-        name: string;
-        type: Type;
-        construction: Construction;
-        lights: Light[];
-        spec: {
-            lastAutoBlock?: boolean;
-        }
-    }
-
-    export type Construction = 'T' | 'K' | null;
-
-    export type Type = 'entry' | 'exit' | 'path' | 'auto_block' | 'shunt';
-
-    export type Light = 'HZ' | 'Z' | 'C' | 'B' | 'X' | 'DZ' | 'M';
-}
-

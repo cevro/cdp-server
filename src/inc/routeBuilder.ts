@@ -2,13 +2,8 @@ import {
     TrainRouteBufferItem,
     TrainRouteDump,
 } from '@definitions/interfaces';
-import {
-    LocoNetMessage,
-} from './DateReceiver';
-import { Message } from '@definitions/messages';
 import RouteLock from 'app/routeLock';
 import { Aspects } from 'app/aspects';
-import { STATUS_BUSY } from 'app/schema/models/modelSector';
 
 class RouteBuilder /*extends LocoNetObject<TrainRouteDump> */ {
 
@@ -47,24 +42,10 @@ class RouteBuilder /*extends LocoNetObject<TrainRouteDump> */ {
         }
     }
 
-    public async handleMessageReceive(message: Message): Promise<void> {
-        /*   switch (message.action) {
-               case 'build':
-                   this.addToBuffer(message.data.id, message.data.buildOptions);
-                   break;
-           }*/
-
-        this.refreshRoutes();
-        await this.tryBuild();
-    }
-
     public toObject(): TrainRouteDump {
         return this.dumpBuffer();
     }
 
-    public handleLocoNetReceive(data: LocoNetMessage) {
-        // builder is server-side no LN comunication needed
-    }
 
     public destroyRoute(routeLock: RouteLock) {
         routeLock.destroyRoute();
@@ -157,7 +138,7 @@ class RouteBuilder /*extends LocoNetObject<TrainRouteDump> */ {
         let isFree = true;
         for (const id in sectors) {
             const sector = sectors[id];
-            isFree = isFree && sector.isFreeAndAllocated(routeLock.getId());
+            // isFree = isFree && sector.isFreeAndAllocated(routeLock.getId());
         }
         if (isFree) {
             routeLock.refresh();
@@ -172,14 +153,14 @@ class RouteBuilder /*extends LocoNetObject<TrainRouteDump> */ {
                 /* if (sector.isFreeAndAllocated(locker.getId())) {
                      this.handleError('');
                  }*/
-                if (sector.state === STATUS_BUSY) {
-                    // posledný sektor znamená zhodenie VC
-                    //  if (sector.getLocoNetId() === trainRoute.endSector.getLocoNetId()) {
-                    //    this.destroyRoute(locker);
-                    // }
-                    busyIndex = +index;
-                    break;
-                }
+                // if (sector.state === STATUS_BUSY) {
+                // posledný sektor znamená zhodenie VC
+                //  if (sector.getLocoNetId() === trainRoute.endSector.getLocoNetId()) {
+                //    this.destroyRoute(locker);
+                // }
+                // busyIndex = +index;
+                // break;
+                //  }
 
             }
             /*
@@ -191,13 +172,13 @@ class RouteBuilder /*extends LocoNetObject<TrainRouteDump> */ {
             }*/
             const unalockIndex = busyIndex - 1;
             if (sectors.hasOwnProperty(unalockIndex)) {
-                if (sectors[unalockIndex].locked === routeLock.getId()) {
-                    routeLock.route.turnoutPositions.forEach((pointPosition) => {
-                        // pointPosition.unlockBySector(locker.getId(), sectors[unalockIndex].getLocoNetId());
-                    });
-                    sectors[unalockIndex].unlock(routeLock.getId());
-                }
+                //  if (sectors[unalockIndex].locked === routeLock.getId()) {
+                routeLock.route.turnoutPositions.forEach((pointPosition) => {
+                    // pointPosition.unlockBySector(locker.getId(), sectors[unalockIndex].getLocoNetId());
+                });
+                // sectors[unalockIndex].unlock(routeLock.getId());
             }
+            // }
         }
 
     }

@@ -9,11 +9,13 @@ import RestServer from 'app/server/restServer';
 import { WebSocketStateUpdateMessage } from 'app/consts/messages';
 import { connection } from 'websocket';
 import { BadRequestError, NotFoundError } from 'restify-errors';
+import SectorService from 'app/schema/services/sectorService';
 
 export default class Container {
     private signalService: SignalService = null;
-
     private turnoutService: TurnoutService = null;
+    private sectorService: SectorService = null;
+
     private schemaConnection: mysql.Connection = null;
 
     private webSocketServer: WebSocketServer = null;
@@ -35,6 +37,14 @@ export default class Container {
         return this.turnoutService;
     }
 
+    public async getSectorService(): Promise<SectorService> {
+        if (!this.sectorService) {
+            this.sectorService = new SectorService();
+            await this.registerEntityService(this.sectorService);
+        }
+        return this.sectorService;
+    }
+
     public getSchemaConnection(): Connection {
         if (!this.schemaConnection) {
             this.schemaConnection = mysql.createConnection(config.schemaDatabase);
@@ -45,7 +55,7 @@ export default class Container {
     public async getWebSocketServer(): Promise<WebSocketServer> {
         if (!this.webSocketServer) {
             this.webSocketServer = new WebSocketServer();
-            const services = [await this.getTurnoutService(), await this.getSignalService()];
+            const services = [await this.getTurnoutService(), await this.getSignalService(), await this.getSectorService()];
             this.webSocketServer.setInitialCallBack((connection: connection) => {
                     const data = {};
                     for (const service of services) {
@@ -78,6 +88,35 @@ export default class Container {
                     return next(new BadRequestError('Param aspect is not included'))
                 }
                 signal.requestChange(body.aspect);
+                response.send(JSON.stringify({message: 'Done'}));
+                next(false);
+            });
+            const sectorService = await this.getSectorService();
+            this.restServer.server.post('/sector/:sectorId', (req, response, next) => {
+                const sector = sectorService.findById(req.params.sectorId);
+                if (!sector) {
+                    return next(new NotFoundError('Sector ' + req.params.sectorId + ' no found'));
+                }
+                const body = JSON.parse(req.body);
+                if (!body.hasOwnProperty('state')) {
+                    return next(new BadRequestError('Param state is not included'))
+                }
+                sector.setState(body.state);
+                response.send(JSON.stringify({message: 'Done'}));
+                next(false);
+            });
+
+            const turnoutService = await this.getTurnoutService();
+            this.restServer.server.post('/turnout/:turnoutId', (req, response, next) => {
+                const turnout = turnoutService.findById(req.params.turnoutId);
+                if (!turnout) {
+                    return next(new NotFoundError('Turnout ' + req.params.turnoutId + ' no found'));
+                }
+                const body = JSON.parse(req.body);
+                if (!body.hasOwnProperty('position')) {
+                    return next(new BadRequestError('Param position is not included'))
+                }
+                turnout.requestChange(body.position);
                 response.send(JSON.stringify({message: 'Done'}));
                 next(false);
             });

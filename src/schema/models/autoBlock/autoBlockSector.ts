@@ -3,8 +3,8 @@ import { ABSectorState } from 'app/consts/interfaces';
 export default class AutoBlockSector /*extends LocoNetObject<ABSectorState> */ {
     private _error: number;
     private _state: number;
-    private active: number;
-    private blockCondition: number;
+    private readonly active: number;
+    private readonly blockCondition: number;
 
     set state(value: number) {
         if (value === this._state) {

@@ -1,26 +1,28 @@
 import ModelSector from '../models/modelSector';
-import { sectors } from 'app/data/sectors';
 import AbstractService from 'app/schema/services/abstractService';
 import { Connection } from 'mysql';
 
 export default class SectorService extends AbstractService<ModelSector> {
 
-    private readonly sectors: ModelSector[];
-
-    constructor() {
-        super();
-        this.sectors = sectors.map(value => {
-            return new ModelSector(value);
-        });
-    }
+    private readonly sectors: ModelSector[] = [];
 
     public getAll(): ModelSector[] {
         return this.sectors;
     }
 
     public loadSchema(connection: Connection): Promise<void> {
-        return Promise.resolve(undefined);
+        return new Promise<void>((resolve, reject) => {
+            connection.query('SELECT * FROM `sector`;', (error, results) => {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                results.forEach((row) => {
+                    const sector = new ModelSector(row);
+                    this.sectors.push(sector);
+                });
+                resolve();
+            });
+        });
     }
 }
-
-export const sectorFactory = new SectorService();

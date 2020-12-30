@@ -2,7 +2,7 @@ import {
     connection,
     server,
 } from 'websocket';
-import { Message, WebSocketStateUpdateMessage } from '@definitions/messages';
+import { WebSocketStateUpdateMessage } from '@definitions/messages';
 import * as http from 'http';
 
 export class WebSocketServer {
@@ -35,10 +35,6 @@ export class WebSocketServer {
             const connection = request.accept('echo-protocol', request.origin);
             this.initialCallback(connection);
         });
-    }
-
-    public log<T extends Message>(message: T) {
-        this.wsServer.broadcast(JSON.stringify(message));
     }
 
     public logChange(message: WebSocketStateUpdateMessage): void {

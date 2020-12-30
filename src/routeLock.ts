@@ -74,7 +74,7 @@ export default class RouteLock {
             const sectors = route.getSectors();
             for (const id in sectors) {
                 const sector = sectors[id];
-                sector.check();
+              //  sector.check();
             }
             // const knot = route.knot;
             // if (knot) {
@@ -103,7 +103,7 @@ export default class RouteLock {
             const sectors = trainRoute.getSectors();
             for (const id in sectors) {
                 const sector = sectors[id];
-                sector.lock(this.getId());
+             //   sector.lock(this.getId());
             }
             trainRoute.startSignal.requestChange(AspectStrategy.calculate(this));
 
@@ -129,7 +129,7 @@ export default class RouteLock {
         }
         const sectors = this.route.getSectors();
         for (const id in sectors) {
-            sectors[id].unlock(this.getId());
+        //    sectors[id].unlock(this.getId());
         }
     }
 }
