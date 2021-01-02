@@ -1,18 +1,16 @@
 import { ENTITY_TURNOUT } from 'app/consts/entity';
 import AbstractModel from 'app/schema/models/abstractModel';
-import { BackendTurnout } from 'app/consts/interfaces';
+import { BackendTurnout } from 'app/consts/interfaces/turnout';
 
-export default class ModelTurnout extends AbstractModel<BackendTurnout.Snapshot> {
+export default class ModelTurnout extends AbstractModel<BackendTurnout.Definition> {
 
-    public readonly name: string;
-    public readonly turnoutUId: string;
-    public readonly turnoutId: number;
-    public readonly basePosition: BackendTurnout.EndPosition;
+    private readonly name: string;
+    private readonly turnoutUId: string;
+    private readonly turnoutId: number;
+    private readonly basePosition: BackendTurnout.EndPosition;
 
-    public currentPosition: BackendTurnout.Position = 'U';
-    public requestedPosition: BackendTurnout.EndPosition | null = null;
-
-    private lockedBy: number[] = [];
+    private currentPosition: BackendTurnout.Position = 'U';
+    private requestedPosition: BackendTurnout.EndPosition | null = null;
 
     constructor(row: BackendTurnout.Row) {
         super(ENTITY_TURNOUT);
@@ -47,36 +45,36 @@ export default class ModelTurnout extends AbstractModel<BackendTurnout.Snapshot>
             //    this.sendState();
         }
     */
-    public toArray(): BackendTurnout.Snapshot {
+    public toArray(): BackendTurnout.Definition {
         return {
             name: this.name,
             turnoutId: this.turnoutId,
             turnoutUId: this.turnoutUId,
-            currentPosition: this.currentPosition,
-            requestedPosition: this.requestedPosition,
+            // currentPosition: this.currentPosition,
+            // requestedPosition: this.requestedPosition,
             basePosition: this.basePosition,
         };
-    }
-
-    public getPrimary(): number {
-        return this.turnoutId;
     }
 
     public getUId(): string {
         return this.turnoutUId;
     }
 
-    public requestChange(position: BackendTurnout.EndPosition) {
-        this.requestedPosition = position;
-        this.emit('change');
-        setTimeout(() => {
-            this.confirmChange(position);
-        }, 4000);
-        /* locoNetConnector.send({
-             locoNetId: 1,// this.locoNetId,
-             type: 's',
-             value: position,
-         });*/
+
+    public requestChange(position: BackendTurnout.EndPosition): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            this.requestedPosition = position;
+            setTimeout(() => {
+                this.confirmChange(position);
+                resolve();
+            }, 1000);
+            /* locoNetConnector.send({
+                 locoNetId: 1,// this.locoNetId,
+                 type: 's',
+                 value: position,
+             });*/
+        });
+
     }
 
     private confirmChange(value: BackendTurnout.EndPosition) {
@@ -84,6 +82,5 @@ export default class ModelTurnout extends AbstractModel<BackendTurnout.Snapshot>
             return;
         }
         this.currentPosition = value;
-        this.emit('change');
     }
 }

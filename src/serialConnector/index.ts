@@ -1,9 +1,16 @@
 import * as SerialPort from 'serialport';
-import {
-    LocoNetMessage,
-    LocoNetReceiver,
-} from 'app/inc/DateReceiver';
 import { PortInfo } from 'serialport';
+
+export interface LocoNetMessage {
+    locoNetId: number;
+    type: string;
+    value: number;
+}
+
+export interface LocoNetReceiver {
+    handleLocoNetReceive(message: LocoNetMessage): void;
+}
+
 
 class SerialConnector /*implements HttpReceiver<Message>*/ {
     private listeners: LocoNetReceiver[] = [];
@@ -55,7 +62,7 @@ class SerialConnector /*implements HttpReceiver<Message>*/ {
                 return;
             }
             this.listeners.forEach((listener) => {
-                listener.handleLocoNetReceive(msg)
+                listener.handleLocoNetReceive(msg);
             });
             // console.log('parsed received:' + data);
         });
@@ -66,11 +73,11 @@ class SerialConnector /*implements HttpReceiver<Message>*/ {
             console.log('errored received:' + msg);
             return null;
         }
-        const parts = msg.split(':');
+        const [loconetId, type, value] = msg.split(':');
         return {
-            locoNetId: +parts[0],
-            type: parts[1],
-            value: +parts[2],
+            locoNetId: +loconetId,
+            type,
+            value: +value,
         };
     }
 }

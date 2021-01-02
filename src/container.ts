@@ -8,18 +8,36 @@ import AbstractService from 'app/schema/services/abstractService';
 import RestServer from 'app/server/restServer';
 import { WebSocketStateUpdateMessage } from 'app/consts/messages';
 import { connection } from 'websocket';
-import { BadRequestError, NotFoundError } from 'restify-errors';
 import SectorService from 'app/schema/services/sectorService';
+import RouteService from 'app/schema/services/routeService';
+import Handler from 'app/server/handlers/handler';
+import RouteBuilder from 'app/routes/routeBuilder';
+import AbstractModel from 'app/schema/models/abstractModel';
+import { CombinedState, createStore, Store } from 'redux';
+import { app, AppStore } from 'app/reducers';
 
-export default class Container {
-    private signalService: SignalService = null;
-    private turnoutService: TurnoutService = null;
-    private sectorService: SectorService = null;
+class Container {
 
-    private schemaConnection: mysql.Connection = null;
+    private reduxStore: Store<CombinedState<AppStore>>;
 
-    private webSocketServer: WebSocketServer = null;
-    private restServer: RestServer = null;
+    private signalService: SignalService;
+    private turnoutService: TurnoutService;
+    private sectorService: SectorService;
+    private routeService: RouteService;
+
+    private routeBuilder: RouteBuilder;
+
+    private schemaConnection: mysql.Connection;
+
+    private webSocketServer: WebSocketServer;
+    private restServer: RestServer;
+
+    public async getRouteBuilder(): Promise<RouteBuilder> {
+        if (!this.routeBuilder) {
+            this.routeBuilder = new RouteBuilder();
+        }
+        return this.routeBuilder;
+    }
 
     public async getSignalService(): Promise<SignalService> {
         if (!this.signalService) {
@@ -45,6 +63,18 @@ export default class Container {
         return this.sectorService;
     }
 
+    public async getRouteService(): Promise<RouteService> {
+        if (!this.routeService) {
+            this.routeService = new RouteService(
+                (await this.getSignalService()),
+                (await this.getSectorService()),
+                (await this.getTurnoutService()),
+            );
+            await this.registerEntityService(this.routeService);
+        }
+        return this.routeService;
+    }
+
     public getSchemaConnection(): Connection {
         if (!this.schemaConnection) {
             this.schemaConnection = mysql.createConnection(config.schemaDatabase);
@@ -56,8 +86,11 @@ export default class Container {
         if (!this.webSocketServer) {
             this.webSocketServer = new WebSocketServer();
             const services = [await this.getTurnoutService(), await this.getSignalService(), await this.getSectorService()];
+            const routeBuilder = (await this.getRouteBuilder());
             this.webSocketServer.setInitialCallBack((connection: connection) => {
-                    const data = {};
+                    const data = {
+                        routeBuilder: routeBuilder.toArray(),
+                    };
                     for (const service of services) {
                         service.getAll().forEach((model) => {
                             data[model.entityName] = data[model.entityName] || [];
@@ -74,67 +107,39 @@ export default class Container {
         return this.webSocketServer;
     }
 
+    public getReduxStore(): Store<CombinedState<any>> {
+        if (!this.reduxStore) {
+            this.reduxStore = createStore(app);
+        }
+        return this.reduxStore;
+    }
+
     public async getRestServer(): Promise<RestServer> {
         if (!this.restServer) {
             this.restServer = new RestServer();
-            const signalService = await this.getSignalService();
-            this.restServer.server.post('/signal/:signalId', (req, response, next) => {
-                const signal = signalService.findById(req.params.signalId);
-                if (!signal) {
-                    return next(new NotFoundError('Signal ' + req.params.signalId + ' no found'));
-                }
-                const body = JSON.parse(req.body);
-                if (!body.hasOwnProperty('aspect')) {
-                    return next(new BadRequestError('Param aspect is not included'))
-                }
-                signal.requestChange(body.aspect);
-                response.send(JSON.stringify({message: 'Done'}));
-                next(false);
-            });
-            const sectorService = await this.getSectorService();
-            this.restServer.server.post('/sector/:sectorId', (req, response, next) => {
-                const sector = sectorService.findById(req.params.sectorId);
-                if (!sector) {
-                    return next(new NotFoundError('Sector ' + req.params.sectorId + ' no found'));
-                }
-                const body = JSON.parse(req.body);
-                if (!body.hasOwnProperty('state')) {
-                    return next(new BadRequestError('Param state is not included'))
-                }
-                sector.setState(body.state);
-                response.send(JSON.stringify({message: 'Done'}));
-                next(false);
-            });
 
-            const turnoutService = await this.getTurnoutService();
-            this.restServer.server.post('/turnout/:turnoutId', (req, response, next) => {
-                const turnout = turnoutService.findById(req.params.turnoutId);
-                if (!turnout) {
-                    return next(new NotFoundError('Turnout ' + req.params.turnoutId + ' no found'));
-                }
-                const body = JSON.parse(req.body);
-                if (!body.hasOwnProperty('position')) {
-                    return next(new BadRequestError('Param position is not included'))
-                }
-                turnout.requestChange(body.position);
-                response.send(JSON.stringify({message: 'Done'}));
-                next(false);
-            });
+            const handler = new Handler(
+                (await this.getSignalService()),
+                (await this.getSectorService()),
+                (await this.getTurnoutService()),
+                (await this.getRouteBuilder()),
+                (await this.getRouteService()),
+            );
+            this.restServer.server.post('/signal/:signalId', (...args) => handler.requestChangeSignal(...args));
+
+            this.restServer.server.post('/sector/:sectorId', (...args) => handler.requestChangeSector(...args));
+
+            this.restServer.server.post('/turnout/:turnoutId', (...args) => handler.requestChangeTurnout(...args));
+
+            this.restServer.server.post('/route/build/:routeId', (...args) => handler.requestRouteBuild(...args));
+
         }
         return this.restServer;
     }
 
-    private async registerEntityService(service: AbstractService<any>) {
+    private async registerEntityService<T extends AbstractModel<any>>(service: AbstractService<T>) {
         await service.loadSchema(this.getSchemaConnection());
-        const webSocketServer = await this.getWebSocketServer();
-        service.getAll().forEach((model) => {
-            model.on('change', () => {
-                webSocketServer.logChange({
-                    data: {
-                        [model.entityName]: [model.toArray()],
-                    },
-                });
-            });
-        });
     }
 }
+
+export const container = new Container();

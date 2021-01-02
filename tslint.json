@@ -47,10 +47,15 @@
       "allow-declarations",
       "allow-named-functions"
     ],
+    "semicolon": {
+      "severity": "error"
+    },
     "newline-per-chained-call": false,
     "completed-docs": false,
     "no-any": false,
-    "no-magic-numbers": false,
+    "no-magic-numbers": {
+      "severity": "warning"
+    },
     "no-non-null-assertion": false,
     "no-null-keyword": false,
     "no-require-imports": false,
@@ -59,9 +64,9 @@
     "no-use-before-declare": false,
     "no-void-expression": false,
     "prefer-function-over-method": false,
-    "strict-type-predicates": false,
+    "strict-type-predicates": true,
     "triple-equals": true,
-    "typedef": false,
+    "typedef": true,
     "ban": [
       true,
       [
@@ -105,9 +110,9 @@
       true,
       "ban-keywords",
       "check-format",
-      "allow-leading-underscore",
-      "allow-pascal-case"
+      "allow-leading-underscore"
     ],
+    "class-name": true,
     "deprecation": true
   }
 }

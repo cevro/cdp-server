@@ -1,10 +1,10 @@
 import AbstractModel from 'app/schema/models/abstractModel';
 import { ENTITY_SECTOR } from 'app/consts/entity';
-import { BackendSector } from 'app/consts/interfaces';
+import { BackendSector } from 'app/consts/interfaces/sector';
 
-export default class ModelSector extends AbstractModel<BackendSector.Snapshot> {
+export default class ModelSector extends AbstractModel<BackendSector.Definition> {
 
-    private state: BackendSector.State;
+    public state: BackendSector.States;
 
     private readonly name: string | null;
     private readonly sectorId: number;
@@ -19,25 +19,20 @@ export default class ModelSector extends AbstractModel<BackendSector.Snapshot> {
         this.state = 'free';
     }
 
-    public setState(state: BackendSector.State) {
+    public setState(state: BackendSector.States) {
         this.state = state;
-        this.emit('change');
-    }
-
-    public getPrimary(): number {
-        return this.sectorId;
     }
 
     public getUId(): string {
         return this.sectorUId;
     }
 
-    public toArray(): BackendSector.Snapshot {
+    public toArray(): BackendSector.Definition {
         return {
             name: this.name,
             sectorId: this.sectorId,
             sectorUId: this.sectorUId,
-            state: this.state,
-        }
+            // state: this.state,
+        };
     }
 }

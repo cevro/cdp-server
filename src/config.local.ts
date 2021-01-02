@@ -5,5 +5,11 @@ export const config = {
         password: 'fykos1',
         database: 'cdp_scheme',
     },
+    restServer: {
+        port: 8082,
+    },
+    websocketServer: {
+        port: 8081,
+    },
 
 };

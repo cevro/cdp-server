@@ -19,19 +19,21 @@ module.exports = {
             formidable: 'commonjs formidable',
         },
     ],
-
+    watchOptions: {
+        ignored: /node_modules/
+    },
     module: {
         rules: [
-          /*  {
-                enforce: 'pre',
-                test: /\.ts$/,
-                loader: 'tslint-loader',
-                exclude: /node_modules/,
-                options: {
-                    failOnHint: false,
-                    configuration: require('../tslint.json')
-                }
-            },*/
+            /*  {
+                  enforce: 'pre',
+                  test: /\.ts$/,
+                  loader: 'tslint-loader',
+                  exclude: /node_modules/,
+                  options: {
+                      failOnHint: false,
+                      configuration: require('../tslint.json')
+                  }
+              },*/
             {
                 test: /\.ts$/,
                 use: 'awesome-typescript-loader',

@@ -1,16 +1,12 @@
-import Container from 'app/container';
+import { container } from 'app/container';
 
 class Main {
-    private readonly container: Container;
 
-    constructor() {
-        this.container = new Container();
-    }
 
     public async run() {
 
-        (await this.container.getWebSocketServer()).run();
-        (await this.container.getRestServer()).run();
+        (await container.getWebSocketServer()).run();
+        (await container.getRestServer()).run();
 
         //  locoNetConnector.registerListener(autoBlockSectorFactory);
         //    locoNetConnector.registerListener(signalFactory);

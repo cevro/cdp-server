@@ -32,7 +32,7 @@ INSERT INTO `turnout` (`turnout_id`, `turnout_uid`, `name`, `base_position`) VAL
 (31,	'zst.pu.t.30',	'30',	'S'),
 (32,	'zst.pu.t.31',	'31',	'S'),
 (33,	'zst.pu.t.32a',	'32a',	'S'),
-(34,	'zst.pu.t.30b',	'32b',	'S'),
+(34,	'zst.pu.t.32b',	'32b',	'S'),
 (35,	'zst.pu.t.33',	'33',	'S'),
 (36,	'zst.pu.t.34a',	'34a',	'S'),
 (37,	'zst.pu.t.34b',	'34b',	'S'),
