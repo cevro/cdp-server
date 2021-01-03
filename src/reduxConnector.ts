@@ -1,45 +1,54 @@
-import { Dispatch, CombinedState, Action, Store } from 'redux';
+import { Dispatch, CombinedState, Action } from 'redux';
 import { AppStore } from 'app/reducers';
 import { container } from 'app/container';
 
+export interface ReduxProps<S, D> {
+    state: S;
+    dispatch: D;
+}
+
 export default abstract class ReduxConnector<S = void, D = void> {
 
-    protected reduxProps: {
-        state: S;
-        dispatch: D;
-    } = {state: undefined, dispatch: undefined};
+    public reduxProps: ReduxProps<S, D> = {state: undefined, dispatch: undefined};
 
-    protected constructor() {
-        this.connect();
+    protected reduxWillConnect(): void {
     }
 
-    protected reduxPropsChanged(): void {
+    protected reduxDidConnected(): void {
     }
 
-    protected reduxStoreConnected(): void {
+    protected reduxPropsWillUpdate(newProps: ReduxProps<S, D>): void {
     }
 
-    protected mapDispatch(dispatch: Dispatch<Action<string>>): D {
-        return;
+    protected reduxPropsDidUpdated(): void {
     }
 
-    protected mapState(state: CombinedState<AppStore>): S {
-        return;
-    }
-
-    private connect() {
+    protected connect(): void {
         const reduxStore = container.getReduxStore();
+        this.reduxWillConnect();
         reduxStore.subscribe(() => {
-            this.innerHandleChange(reduxStore);
-            this.reduxPropsChanged();
+            this.innerPullReduxStore();
         });
-        this.innerHandleChange(reduxStore);
-        this.reduxStoreConnected();
+        this.forcePullReduxStore();
+        this.reduxDidConnected();
     }
 
-    private innerHandleChange(reduxStore: Store<CombinedState<AppStore>>): void {
-        this.reduxProps.state = this.mapState(reduxStore.getState());
-        this.reduxProps.dispatch = this.mapDispatch(reduxStore.dispatch);
+    public forcePullReduxStore(): void {
+        this.innerPullReduxStore();
     }
 
+    protected abstract mapState(state: CombinedState<AppStore>): S;
+
+    protected abstract mapDispatch(dispatch: Dispatch<Action<string>>): D;
+
+    private innerPullReduxStore() {
+        const reduxStore = container.getReduxStore();
+        const newState: ReduxProps<S, D> = {
+            state: this.mapState(reduxStore.getState()),
+            dispatch: this.mapDispatch(reduxStore.dispatch),
+        };
+        this.reduxPropsWillUpdate(newState);
+        this.reduxProps = newState;
+        this.reduxPropsDidUpdated();
+    }
 }

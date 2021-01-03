@@ -11,7 +11,6 @@ export interface LocoNetReceiver {
     handleLocoNetReceive(message: LocoNetMessage): void;
 }
 
-
 class SerialConnector /*implements HttpReceiver<Message>*/ {
     private listeners: LocoNetReceiver[] = [];
 
@@ -83,4 +82,3 @@ class SerialConnector /*implements HttpReceiver<Message>*/ {
 }
 
 export const locoNetConnector = new SerialConnector();
-

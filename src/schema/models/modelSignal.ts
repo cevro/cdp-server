@@ -1,13 +1,17 @@
 import { ENTITY_SIGNAL } from 'app/consts/entity';
 import AbstractModel from 'app/schema/models/abstractModel';
 import { Aspect, BackendSignal } from 'app/consts/interfaces/signal';
-import { aspectChanged, initSignal } from 'app/actions/signal';
-import { CombinedState } from 'redux';
+import { SignalActions } from 'app/actions/signal';
+import { Action, CombinedState, Dispatch } from 'redux';
 import { AppStore } from 'app/reducers';
+import { ReduxProps } from 'app/reduxConnector';
 
 interface DispatchObject {
-    onInit: () => void;
-    onChangeAspect: (aspect: number) => void;
+    onInit(): void;
+
+    onChangeAspect(aspect: number): void;
+
+    onRequestChange(aspect: number): void;
 }
 
 export default class ModelSignal extends AbstractModel<BackendSignal.Definition, BackendSignal.State, DispatchObject> {
@@ -34,49 +38,22 @@ export default class ModelSignal extends AbstractModel<BackendSignal.Definition,
         this.spec = {
             lastAutoBlock: row.last_auto_block,
         };
-        this.requestChange(Aspect.STOP);
-        setTimeout(() => {
-
-            this.confirmChange(Aspect.STOP);
-        }, 1000);
+        this.connect();
     }
 
-    public getDisplayedAspect() {
-        return this.reduxProps.state.requestedAspect;
+    protected reduxDidConnected() {
+        super.reduxDidConnected();
+        this.reduxProps.dispatch.onInit();
+        this.reduxProps.dispatch.onRequestChange(Aspect.STOP);
     }
 
-    /* public handleLocoNetReceive(data: LocoNetMessage): void {
-         switch (data.type) {
-             case 'a':
-                 console.log('a');
-                 return this.confirmChange(data.value);
-             case 'r':
-                 return console.log('r');
-         }
-         return;
-     }*/
-
-    public requestChange(aspect: number): void {
-        this.change(aspect);
-        /*if (aspect === this.requestedAspect) {
-            return;
+    protected reduxPropsWillUpdate(newProps: ReduxProps<BackendSignal.State, DispatchObject>) {
+        super.reduxPropsWillUpdate(newProps);
+        if (this.reduxProps.state && newProps.state && this.reduxProps.state.requestedAspect !== newProps.state.requestedAspect) {
+            setTimeout(() => {
+                this.reduxProps.dispatch.onChangeAspect(newProps.state.requestedAspect);
+            }, 2000);
         }
-        this.requestedAspect = +aspect;
-        ;*/
-
-        /*  locoNetConnector.send({
-              locoNetId: 1,// this.locoNetId,
-              type: 'a',
-              value: aspect,
-          });*/
-        //   this.sendState();
-    }
-
-    public change(aspect: number) {
-        setTimeout(() => {
-
-            this.confirmChange(aspect);
-        }, 2000);
     }
 
     public toArray(): BackendSignal.Definition {
@@ -95,26 +72,18 @@ export default class ModelSignal extends AbstractModel<BackendSignal.Definition,
         return this.signalUId;
     }
 
-    public confirmChange(value: number): void {
-        this.reduxProps.dispatch.onChangeAspect(value);
-    }
-
-    protected reduxStoreConnected() {
-        super.reduxStoreConnected();
-        this.reduxProps.dispatch.onInit();
-    }
-
-    protected mapDispatch(dispatch) {
-        const signalUId = this.getUId();
+    protected mapDispatch(dispatch: Dispatch<Action<string>>) {
         return {
-            onInit: () => dispatch(initSignal(signalUId)),
-            onChangeAspect: (aspect: number) => dispatch(aspectChanged(signalUId, aspect)),
+            onInit: () => dispatch(SignalActions.init(this.getUId())),
+            onChangeAspect: (aspect: number) => dispatch(SignalActions.aspectChanged(this.getUId(), aspect)),
+            onRequestChange: (aspect: number) => dispatch(SignalActions.requestChangeAspect(this.getUId(), aspect)),
         };
     }
 
-    public mapState(store: CombinedState<AppStore>) {
+    protected mapState(store: CombinedState<AppStore>) {
         return {
             ...store.signals[this.getUId()],
         };
     }
+
 }

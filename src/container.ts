@@ -13,8 +13,9 @@ import RouteService from 'app/schema/services/routeService';
 import Handler from 'app/server/handlers/handler';
 import RouteBuilder from 'app/routes/routeBuilder';
 import AbstractModel from 'app/schema/models/abstractModel';
-import { CombinedState, createStore, Store } from 'redux';
+import { CombinedState, createStore, Store, applyMiddleware } from 'redux';
 import { app, AppStore } from 'app/reducers';
+import logger from 'redux-logger';
 
 class Container {
 
@@ -34,7 +35,7 @@ class Container {
 
     public async getRouteBuilder(): Promise<RouteBuilder> {
         if (!this.routeBuilder) {
-            this.routeBuilder = new RouteBuilder();
+            this.routeBuilder = new RouteBuilder((await this.getRouteService()));
         }
         return this.routeBuilder;
     }
@@ -66,9 +67,7 @@ class Container {
     public async getRouteService(): Promise<RouteService> {
         if (!this.routeService) {
             this.routeService = new RouteService(
-                (await this.getSignalService()),
                 (await this.getSectorService()),
-                (await this.getTurnoutService()),
             );
             await this.registerEntityService(this.routeService);
         }
@@ -86,19 +85,17 @@ class Container {
         if (!this.webSocketServer) {
             this.webSocketServer = new WebSocketServer();
             const services = [await this.getTurnoutService(), await this.getSignalService(), await this.getSectorService()];
-            const routeBuilder = (await this.getRouteBuilder());
             this.webSocketServer.setInitialCallBack((connection: connection) => {
-                    const data = {
-                        routeBuilder: routeBuilder.toArray(),
-                    };
+                    const definitions = {};
                     for (const service of services) {
                         service.getAll().forEach((model) => {
-                            data[model.entityName] = data[model.entityName] || [];
-                            data[model.entityName].push(model.toArray());
+                            const entityName = model.entityName + 's';
+                            definitions[entityName] = definitions[entityName] || {};
+                            definitions[entityName][model.getUId()] = model.toArray();
                         });
                     }
                     const message: WebSocketStateUpdateMessage = {
-                        data,
+                        definitions,
                     };
                     connection.send(JSON.stringify(message));
                 },
@@ -109,7 +106,7 @@ class Container {
 
     public getReduxStore(): Store<CombinedState<any>> {
         if (!this.reduxStore) {
-            this.reduxStore = createStore(app);
+            this.reduxStore = createStore(app/*, applyMiddleware(logger)*/);
         }
         return this.reduxStore;
     }
@@ -122,7 +119,6 @@ class Container {
                 (await this.getSignalService()),
                 (await this.getSectorService()),
                 (await this.getTurnoutService()),
-                (await this.getRouteBuilder()),
                 (await this.getRouteService()),
             );
             this.restServer.server.post('/signal/:signalId', (...args) => handler.requestChangeSignal(...args));

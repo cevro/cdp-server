@@ -113,7 +113,9 @@
       "allow-leading-underscore"
     ],
     "class-name": true,
-    "deprecation": true
+    "deprecation": true,
+    "eofline": true,
+    "no-consecutive-blank-lines": true
   }
 }
 

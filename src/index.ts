@@ -2,9 +2,8 @@ import { container } from 'app/container';
 
 class Main {
 
-
     public async run() {
-
+        (await container.getRouteBuilder());
         (await container.getWebSocketServer()).run();
         (await container.getRestServer()).run();
 
@@ -15,7 +14,6 @@ class Main {
         // locoNetConnector.tryConnect();
         // console.log('run');
     }
-
 }
 
 setTimeout(() => (new Main()).run(), 2000);

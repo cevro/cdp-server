@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "redux": "^4.0.5",
+    "redux-logger": "^3.0.6",
     "restify": "^8.5.1",
     "restify-errors": "^8.0.2",
     "serialport": "~7.1.5",
@@ -22,6 +23,7 @@
   },
   "devDependencies": {
     "@types/redux": "^3.6.0",
+    "@types/redux-logger": "^3.0.8",
     "@types/restify": "^8.4.2",
     "@types/restify-errors": "^4.3.3",
     "@types/mysql": "^2.15.16",

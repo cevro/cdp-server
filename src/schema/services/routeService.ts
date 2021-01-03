@@ -6,7 +6,6 @@ import SectorService from 'app/schema/services/sectorService';
 import TurnoutService from 'app/schema/services/turnoutService';
 import { BackendTurnout } from 'app/consts/interfaces/turnout';
 
-
 export interface TrainRouteDefinition {
     id: number;
     name: string;
@@ -102,8 +101,8 @@ const routes: TrainRouteDefinition[] = [
         id: 3003,
         name: '3-3a',
         sectorIds: [
-            /* 3021,
-             3110,*/
+            'zst.pu.s.3C',
+            'zst.pu.s.3a',
         ],
         turnoutPositions: [
             ['zst.pu.t.23', 'S'],
@@ -181,36 +180,20 @@ const routes: TrainRouteDefinition[] = [
     },
 ];
 
-
 export default class RouteService extends AbstractService<ModelRoute> {
 
     private routes: ModelRoute[];
 
-    private readonly signalService: SignalService;
     private readonly sectorService: SectorService;
-    private readonly serviceTurnout: TurnoutService;
 
-    constructor(signalService: SignalService, sectorService: SectorService, serviceTurnout: TurnoutService) {
+    constructor(sectorService: SectorService) {
         super();
         this.sectorService = sectorService;
-        this.signalService = signalService;
-        this.serviceTurnout = serviceTurnout;
     }
-
-    /*
-    public handleMessageReceive(message: Message): void {
-        if (message.entity !== 'route-finder') {
-            return;
-        }
-        switch (message.action) {
-            case 'find':
-                return this.handeFindRoute(message);
-        }
-    }*/
 
     public findRoute(startSignalUId: string, endSignalUId: string): ModelRoute[] {
         return this.routes.filter((route) => {
-            return (route.startSignal.getUId() === startSignalUId) && (route.endSignal.getUId());
+            // return (route.startSignal.getUId() === startSignalUId) && (route.endSignal.getUId());
         });
     }
 
@@ -226,12 +209,12 @@ export default class RouteService extends AbstractService<ModelRoute> {
                         sufficient_distance: def.sufficientDistance ? def.sufficientDistance : false,
                     },
                     def,
-                    this.signalService.findByUId(def.startSignalId),
-                    def.endSignalId ? this.signalService.findByUId(def.endSignalId) : null,
+                    def.startSignalId,
+                    def.endSignalId,
                     def.turnoutPositions.map(pos => {
-                        return {turnout: this.serviceTurnout.findByUId(pos[0]), position: pos[1]};
+                        return {turnoutUId: pos[0], position: pos[1]};
                     }),
-                    def.sectorIds.map(id => this.sectorService.findByUId(id)),
+                    def.sectorIds,
                     null,
                 );
             });

@@ -10,7 +10,8 @@ import { AppStore } from 'app/reducers';
 import ReduxConnector from 'app/reduxConnector';
 
 export class WebSocketServer extends ReduxConnector<AppStore, void> {
-    private wsServer: server;
+
+    private readonly wsServer: server;
     private initialCallback: (connection: connection) => void;
 
     constructor() {
@@ -28,7 +29,7 @@ export class WebSocketServer extends ReduxConnector<AppStore, void> {
             httpServer: httpServer,
             autoAcceptConnections: false,
         });
-
+        this.connect();
     }
 
     public setInitialCallBack(callback: (connection: connection) => void) {
@@ -39,37 +40,32 @@ export class WebSocketServer extends ReduxConnector<AppStore, void> {
         this.wsServer.on('request', (request) => {
             const connection = request.accept('echo-protocol', request.origin);
             this.initialCallback(connection);
+            this.logChange();
         });
     }
 
-    public logChange(message: WebSocketStateUpdateMessage): void {
+    public reduxPropsDidUpdated() {
+        super.reduxPropsDidUpdated();
+        this.logChange();
+    }
+
+    protected mapState(state: CombinedState<AppStore>) {
+        return state;
+    }
+
+    protected mapDispatch(dispatch: Dispatch<Action<string>>) {
+        return;
+    }
+
+    private logChange(): void {
         if (this.wsServer) {
-            this.wsServer.broadcast(JSON.stringify(message));
+            this.wsServer.broadcast(JSON.stringify(this.mapStateToMessage()));
         }
-
-    }
-
-    protected reduxPropsChanged() {
-        super.reduxPropsChanged();
-        this.logChange(this.mapStateToMessage());
-    }
-
-
-    public mapState(store: CombinedState<AppStore>) {
-        return store;
-    }
-
-    public mapDispatch(dispatch: Dispatch<Action<string>>) {
-
     }
 
     private mapStateToMessage(): WebSocketStateUpdateMessage {
         return {
-            state: {
-                signals: {
-                    ...this.reduxProps.state.signals,
-                },
-            },
+            state: this.reduxProps.state,
         };
     }
 }

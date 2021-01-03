@@ -2,7 +2,6 @@ import { createServer, plugins, Server } from 'restify';
 import bodyParser = plugins.bodyParser;
 import { config } from 'app/config.local';
 
-
 export default class RestServer {
     public readonly server: Server;
 

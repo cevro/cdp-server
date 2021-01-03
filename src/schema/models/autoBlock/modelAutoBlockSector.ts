@@ -1,5 +1,7 @@
 import AbstractModel from 'app/schema/models/abstractModel';
 import { ENTITY_AB_SECTOR } from 'app/consts/entity';
+import { AppStore } from 'app/reducers';
+import { CombinedState, Dispatch, Action } from 'redux';
 
 export default class ModelAutoBlockSector extends AbstractModel<{
     active: boolean;
@@ -7,7 +9,6 @@ export default class ModelAutoBlockSector extends AbstractModel<{
     sectorId: number;
     sectorUId: string;
 }> {
-
     public readonly sectorId: number;
     public readonly sectorUId: string;
 
@@ -57,4 +58,9 @@ export default class ModelAutoBlockSector extends AbstractModel<{
             }
             // console.log(this);
         }*/
+
+    protected mapState(state: CombinedState<AppStore>) {
+    }
+    protected mapDispatch(dispatch: Dispatch<Action<string>>) {
+    }
 }

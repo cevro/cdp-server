@@ -1,16 +1,26 @@
 import { ENTITY_TURNOUT } from 'app/consts/entity';
 import AbstractModel from 'app/schema/models/abstractModel';
 import { BackendTurnout } from 'app/consts/interfaces/turnout';
+import { Action, CombinedState, Dispatch } from 'redux';
+import { AppStore } from 'app/reducers';
+import { TurnoutActions } from 'app/actions/turnout';
+import { ReduxProps } from 'app/reduxConnector';
+import { BackendSignal } from 'app/consts/interfaces/signal';
 
-export default class ModelTurnout extends AbstractModel<BackendTurnout.Definition> {
+interface DispatchState {
+    onInit(): void;
+
+    onChangePosition(position: BackendTurnout.Position): void;
+
+    onRequestChangePosition(position: BackendTurnout.EndPosition): void;
+}
+
+export default class ModelTurnout extends AbstractModel<BackendTurnout.Definition, BackendTurnout.State, DispatchState> {
 
     private readonly name: string;
     private readonly turnoutUId: string;
     private readonly turnoutId: number;
     private readonly basePosition: BackendTurnout.EndPosition;
-
-    private currentPosition: BackendTurnout.Position = 'U';
-    private requestedPosition: BackendTurnout.EndPosition | null = null;
 
     constructor(row: BackendTurnout.Row) {
         super(ENTITY_TURNOUT);
@@ -18,40 +28,30 @@ export default class ModelTurnout extends AbstractModel<BackendTurnout.Definitio
         this.turnoutId = row.turnout_id;
         this.turnoutUId = row.turnout_uid;
         this.basePosition = row.base_position;
+        this.connect();
+
     }
 
-    /*
-        public check(position: RequestedTurnoutPosition): void {
-            if (this.position === position) {
-                return;
-            }
-            if (this.lockedBy.length) {
-                throw new PointLockedError(this, position);
-            }
-        }
+    protected reduxDidConnected() {
+        super.reduxDidConnected();
+        this.reduxProps.dispatch.onInit();
+        this.reduxProps.dispatch.onRequestChangePosition('S');
+    }
 
-        public async lock(trainLockId: number, position: RequestedTurnoutPosition) {
-            if (this.position !== position) {
-                await this.changePosition(position);
-            }
-            this.lockedBy.push(trainLockId);
-            //   this.sendState();
+    protected reduxPropsWillUpdate(newProps: ReduxProps<BackendTurnout.State, DispatchState>) {
+        super.reduxPropsWillUpdate(newProps);
+        if (this.reduxProps.state && newProps.state && this.reduxProps.state.requestedPosition !== newProps.state.requestedPosition) {
+            setTimeout(() => {
+                this.reduxProps.dispatch.onChangePosition(newProps.state.requestedPosition);
+            }, 2000);
         }
+    }
 
-        public unlock(id: number) {
-            this.lockedBy = this.lockedBy.filter((lockerId) => {
-                return lockerId !== id;
-            });
-            //    this.sendState();
-        }
-    */
     public toArray(): BackendTurnout.Definition {
         return {
             name: this.name,
             turnoutId: this.turnoutId,
             turnoutUId: this.turnoutUId,
-            // currentPosition: this.currentPosition,
-            // requestedPosition: this.requestedPosition,
             basePosition: this.basePosition,
         };
     }
@@ -60,27 +60,19 @@ export default class ModelTurnout extends AbstractModel<BackendTurnout.Definitio
         return this.turnoutUId;
     }
 
-
-    public requestChange(position: BackendTurnout.EndPosition): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
-            this.requestedPosition = position;
-            setTimeout(() => {
-                this.confirmChange(position);
-                resolve();
-            }, 1000);
-            /* locoNetConnector.send({
-                 locoNetId: 1,// this.locoNetId,
-                 type: 's',
-                 value: position,
-             });*/
-        });
-
+    protected mapDispatch(dispatch: Dispatch<Action<string>>): DispatchState {
+        return {
+            onInit: () => dispatch(TurnoutActions.init(this.getUId())),
+            onChangePosition: (position: BackendTurnout.Position) =>
+                dispatch(TurnoutActions.positionChanged(this.getUId(), position)),
+            onRequestChangePosition: (position: BackendTurnout.EndPosition) =>
+                dispatch(TurnoutActions.requestChangePosition(this.getUId(), position)),
+        };
     }
 
-    private confirmChange(value: BackendTurnout.EndPosition) {
-        if (value === this.currentPosition) {
-            return;
-        }
-        this.currentPosition = value;
+    protected mapState(state: CombinedState<AppStore>): BackendTurnout.State {
+        return {
+            ...state.turnouts[this.getUId()],
+        };
     }
 }

@@ -46,16 +46,16 @@ const autoBlockSectors: any[] = [
 
 ];
 export default class AutoBlockSectorsFactory /*extends LocoNetObjectsFactory<Message, ABSectorState> */ {
-    private readonly ABSectors: ABSector[];
+    private readonly autoBlockSectors: ABSector[];
 
     constructor() {
         // super();
-        this.ABSectors = autoBlockSectors.map((value: any) => {
+        this.autoBlockSectors = autoBlockSectors.map((value: any) => {
             return new ABSector(value);
         });
     }
 
     protected getObjects(): ABSector[] {
-        return this.ABSectors;
+        return this.autoBlockSectors;
     }
 }
