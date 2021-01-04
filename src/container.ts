@@ -6,16 +6,13 @@ import { config } from 'app/config.local';
 import { WebSocketServer } from 'app/server/webSocketServer';
 import AbstractService from 'app/schema/services/abstractService';
 import RestServer from 'app/server/restServer';
-import { WebSocketStateUpdateMessage } from 'app/consts/messages';
-import { connection } from 'websocket';
 import SectorService from 'app/schema/services/sectorService';
-import RouteService from 'app/schema/services/routeService';
 import Handler from 'app/server/handlers/handler';
 import RouteBuilder from 'app/routes/routeBuilder';
-import AbstractModel from 'app/schema/models/abstractModel';
-import { CombinedState, createStore, Store, applyMiddleware } from 'redux';
+import { CombinedState, createStore, Store } from 'redux';
 import { app, AppStore } from 'app/reducers';
-import logger from 'redux-logger';
+import RouteService from 'app/routes/routeService';
+import SerialConnector from 'app/serialConnector';
 
 class Container {
 
@@ -25,6 +22,7 @@ class Container {
     private turnoutService: TurnoutService;
     private sectorService: SectorService;
     private routeService: RouteService;
+    private serialConnector: SerialConnector;
 
     private routeBuilder: RouteBuilder;
 
@@ -35,9 +33,21 @@ class Container {
 
     public async getRouteBuilder(): Promise<RouteBuilder> {
         if (!this.routeBuilder) {
-            this.routeBuilder = new RouteBuilder((await this.getRouteService()));
+            this.routeBuilder = new RouteBuilder(
+                (await this.getRouteService()),
+                (await this.getSignalService()),
+                (await this.getSectorService()),
+                (await this.getTurnoutService()),
+            );
         }
         return this.routeBuilder;
+    }
+
+    public async getSerialConnector(): Promise<SerialConnector> {
+        if (!this.serialConnector) {
+            this.serialConnector = new SerialConnector();
+        }
+        return this.serialConnector;
     }
 
     public async getSignalService(): Promise<SignalService> {
@@ -66,10 +76,9 @@ class Container {
 
     public async getRouteService(): Promise<RouteService> {
         if (!this.routeService) {
-            this.routeService = new RouteService(
-                (await this.getSectorService()),
-            );
-            await this.registerEntityService(this.routeService);
+            this.routeService = new RouteService();
+            await this.routeService.loadSchema(this.getSchemaConnection());
+            //   await this.registerEntityService(this.routeService);
         }
         return this.routeService;
     }
@@ -84,27 +93,11 @@ class Container {
     public async getWebSocketServer(): Promise<WebSocketServer> {
         if (!this.webSocketServer) {
             this.webSocketServer = new WebSocketServer();
-            const services = [await this.getTurnoutService(), await this.getSignalService(), await this.getSectorService()];
-            this.webSocketServer.setInitialCallBack((connection: connection) => {
-                    const definitions = {};
-                    for (const service of services) {
-                        service.getAll().forEach((model) => {
-                            const entityName = model.entityName + 's';
-                            definitions[entityName] = definitions[entityName] || {};
-                            definitions[entityName][model.getUId()] = model.toArray();
-                        });
-                    }
-                    const message: WebSocketStateUpdateMessage = {
-                        definitions,
-                    };
-                    connection.send(JSON.stringify(message));
-                },
-            );
         }
         return this.webSocketServer;
     }
 
-    public getReduxStore(): Store<CombinedState<any>> {
+    public getReduxStore(): Store<CombinedState<AppStore>> {
         if (!this.reduxStore) {
             this.reduxStore = createStore(app/*, applyMiddleware(logger)*/);
         }
@@ -133,7 +126,7 @@ class Container {
         return this.restServer;
     }
 
-    private async registerEntityService<T extends AbstractModel<any>>(service: AbstractService<T>) {
+    private async registerEntityService(service: AbstractService<any, any, any>) {
         await service.loadSchema(this.getSchemaConnection());
     }
 }

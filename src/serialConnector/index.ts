@@ -1,26 +1,43 @@
 import * as SerialPort from 'serialport';
-import { PortInfo } from 'serialport';
+import ReduxConnector from 'app/reduxConnector';
+import { Action, CombinedState, Dispatch } from 'redux';
+import { AppStore } from 'app/reducers';
+import { SerialMapping } from 'app/serialConnector/mapping';
+import { addReceived, sendSuccess } from 'app/actions/serial';
+import { MapObjects } from 'app/consts/messages';
 
-export interface LocoNetMessage {
-    locoNetId: number;
+export interface SerialMessage {
+    uId: string | null;
     type: string;
     value: number;
 }
 
-export interface LocoNetReceiver {
-    handleLocoNetReceive(message: LocoNetMessage): void;
-}
-
-class SerialConnector /*implements HttpReceiver<Message>*/ {
-    private listeners: LocoNetReceiver[] = [];
-
+export default class SerialConnector extends ReduxConnector<{
+    toSent: MapObjects<SerialMessage>;
+}, {
+    onMessageReceive(message: SerialMessage): void;
+    onMessageSent(messageId: string): void;
+}> {
     private connector: SerialPort;
-    private params: SerialPort.OpenOptions;
-    private ports: PortInfo[] = [];
 
-    private port: string = '/dev/ttyUSB1';
+    private port: string = '/dev/ttyUSB0';
 
-    public tryConnect() {
+    constructor() {
+        super();
+        this.tryConnect();
+        this.connect();
+    }
+
+    protected reduxPropsDidUpdated(oldProps) {
+        super.reduxPropsDidUpdated(oldProps);
+        for (const messageId in this.reduxProps.state.toSent) {
+            if (this.reduxProps.state.toSent.hasOwnProperty(messageId)) {
+                this.send(this.reduxProps.state.toSent[messageId], messageId);
+            }
+        }
+    }
+
+    public tryConnect(): void {
 
         try {
             this.connector = new SerialPort(this.port, {
@@ -30,7 +47,7 @@ class SerialConnector /*implements HttpReceiver<Message>*/ {
                 parity: 'none',
                 stopBits: 1,
             }, (err) => {
-                // console.log(err);
+                console.log(err);
             });
             this.dateReceive();
         } catch (e) {
@@ -38,14 +55,24 @@ class SerialConnector /*implements HttpReceiver<Message>*/ {
         }
     }
 
-    public registerListener(listener: LocoNetReceiver) {
-        this.listeners.push(listener);
+    public send(data: SerialMessage, messageId: string): void {
+        const msg = SerialMapping.getSerialId(data.uId) + ':' + data.type + ':' + data.value + '\r\n';
+        console.log('send:' + msg);
+        this.connector.write(msg);
+        this.reduxProps.dispatch.onMessageSent(messageId);
     }
 
-    public send(data: LocoNetMessage): void {
-        const msg = data.locoNetId + ':' + data.type + ':' + data.value + '\r\n';
-        // console.log('send:' + msg);
-        this.connector.write(msg);
+    protected mapDispatch(dispatch: Dispatch<Action<string>>) {
+        return {
+            onMessageReceive: (message: SerialMessage) => dispatch(addReceived(message)),
+            onMessageSent: (messageId: string) => dispatch(sendSuccess(messageId)),
+        };
+    }
+
+    protected mapState(state: CombinedState<AppStore>) {
+        return {
+            toSent: state.serialConnector.toSent,
+        };
     }
 
     private dateReceive(): void {
@@ -60,25 +87,20 @@ class SerialConnector /*implements HttpReceiver<Message>*/ {
             if (!msg) {
                 return;
             }
-            this.listeners.forEach((listener) => {
-                listener.handleLocoNetReceive(msg);
-            });
-            // console.log('parsed received:' + data);
+            this.reduxProps.dispatch.onMessageReceive(msg);
         });
     }
 
-    private parseMessage(msg: string): LocoNetMessage {
+    private parseMessage(msg: string): SerialMessage {
         if (!msg.match(/[0-9]+:[a-z]:-?[0-9]+/)) {
             console.log('errored received:' + msg);
             return null;
         }
-        const [loconetId, type, value] = msg.split(':');
+        const [serialId, type, value] = msg.split(':');
         return {
-            locoNetId: +loconetId,
+            uId: SerialMapping.getUId(+serialId),
             type,
             value: +value,
         };
     }
 }
-
-export const locoNetConnector = new SerialConnector();

@@ -1,7 +1,4 @@
-import {
-    connection,
-    server,
-} from 'websocket';
+import { server } from 'websocket';
 import { WebSocketStateUpdateMessage } from '@definitions/messages';
 import * as http from 'http';
 import { config } from 'app/config.local';
@@ -12,7 +9,6 @@ import ReduxConnector from 'app/reduxConnector';
 export class WebSocketServer extends ReduxConnector<AppStore, void> {
 
     private readonly wsServer: server;
-    private initialCallback: (connection: connection) => void;
 
     constructor() {
         super();
@@ -32,20 +28,16 @@ export class WebSocketServer extends ReduxConnector<AppStore, void> {
         this.connect();
     }
 
-    public setInitialCallBack(callback: (connection: connection) => void) {
-        this.initialCallback = callback;
-    }
-
     public run() {
         this.wsServer.on('request', (request) => {
             const connection = request.accept('echo-protocol', request.origin);
-            this.initialCallback(connection);
+            connection.send(JSON.stringify(this.mapStateToMessage()));
             this.logChange();
         });
     }
 
-    public reduxPropsDidUpdated() {
-        super.reduxPropsDidUpdated();
+    public reduxPropsDidUpdated(oldProps) {
+        super.reduxPropsDidUpdated(oldProps);
         this.logChange();
     }
 
@@ -65,7 +57,9 @@ export class WebSocketServer extends ReduxConnector<AppStore, void> {
 
     private mapStateToMessage(): WebSocketStateUpdateMessage {
         return {
-            state: this.reduxProps.state,
+            store: {
+                ...this.reduxProps.state,
+            },
         };
     }
 }

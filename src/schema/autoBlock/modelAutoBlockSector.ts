@@ -1,5 +1,4 @@
 import AbstractModel from 'app/schema/models/abstractModel';
-import { ENTITY_AB_SECTOR } from 'app/consts/entity';
 import { AppStore } from 'app/reducers';
 import { CombinedState, Dispatch, Action } from 'redux';
 
@@ -18,7 +17,7 @@ export default class ModelAutoBlockSector extends AbstractModel<{
     public blockCondition: number;
 
     constructor(data: any) {
-        super(ENTITY_AB_SECTOR);
+        super();
         this.state = -1;
         this.error = -1;
         this.active = -1;

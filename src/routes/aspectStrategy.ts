@@ -1,12 +1,14 @@
 import { Aspect } from 'app/consts/interfaces/signal';
 import { BackendRouteLock } from 'app/consts/interfaces/routeLock';
 import BuildOptions = BackendRouteLock.BuildOptions;
-import ModelRoute from 'app/schema/models/modelRoute';
+import ModelRoute from 'app/routes/modelRoute';
+import ModelSignal from 'app/schema/models/modelSignal';
 
 export default class AspectStrategy {
 
-    public static calculate(buildOptions: BuildOptions, route: ModelRoute): number {
-        let endSignalId = route.endSignalUId ? route.reduxProps.state.endSignal.displayedAspect : Aspect.CLEAR;
+    public static calculate(buildOptions: BuildOptions, route: ModelRoute, endSignal: ModelSignal | null): number {
+
+        let endSignalId = endSignal ? endSignal.getDisplayedAspect() : Aspect.CLEAR;
         if (buildOptions.PN) {
             return Aspect.PN;
         }

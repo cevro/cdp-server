@@ -1,8 +1,8 @@
-import ModelTrackApproval, {} from 'app/schema/models/tractApproval/modelTrackApproval';
-import ModelBiAutoBlock from 'app/schema/models/autoBlock/modelBiAutoBlock';
 import { BackendApproval } from 'app/consts/interfaces/approval';
 import { Action, CombinedState, Dispatch } from 'redux';
 import { AppStore } from 'app/reducers';
+import ModelBiAutoBlock from 'app/schema/autoBlock/modelBiAutoBlock';
+import ModelTrackApproval from 'app/schema/tractApproval/modelTrackApproval';
 
 export default class ModelBiAutoBlockApproval extends ModelTrackApproval {
 
@@ -22,5 +22,4 @@ export default class ModelBiAutoBlockApproval extends ModelTrackApproval {
 
     protected mapState(state: CombinedState<AppStore>): any {
     }
-
 }

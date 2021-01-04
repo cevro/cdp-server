@@ -1,10 +1,6 @@
-import ModelRoute, { BackendRoute } from 'app/schema/models/modelRoute';
-import AbstractService from 'app/schema/services/abstractService';
 import { Connection } from 'mysql';
-import SignalService from 'app/schema/services/signalService';
-import SectorService from 'app/schema/services/sectorService';
-import TurnoutService from 'app/schema/services/turnoutService';
 import { BackendTurnout } from 'app/consts/interfaces/turnout';
+import ModelRoute, { BackendRoute } from 'app/routes/modelRoute';
 
 export interface TrainRouteDefinition {
     id: number;
@@ -180,21 +176,24 @@ const routes: TrainRouteDefinition[] = [
     },
 ];
 
-export default class RouteService extends AbstractService<ModelRoute> {
+export default class RouteService {
 
-    private routes: ModelRoute[];
-
-    private readonly sectorService: SectorService;
-
-    constructor(sectorService: SectorService) {
-        super();
-        this.sectorService = sectorService;
-    }
+    private routes: ModelRoute[]=[];
 
     public findRoute(startSignalUId: string, endSignalUId: string): ModelRoute[] {
         return this.routes.filter((route) => {
             // return (route.startSignal.getUId() === startSignalUId) && (route.endSignal.getUId());
         });
+    }
+
+    public findByUId(uId: string): ModelRoute {
+        const candidates = this.getAll().filter((model) => {
+            return model.getUId() === uId;
+        });
+        if (candidates.length !== 1) {
+            throw Error('Cannot find a model');
+        }
+        return candidates[0];
     }
 
     public loadSchema(connection: Connection): Promise<void> {
@@ -222,7 +221,7 @@ export default class RouteService extends AbstractService<ModelRoute> {
         });
     }
 
-    public getAll(): ModelRoute[] {
+    public getAll() {
         return this.routes;
     }
 }

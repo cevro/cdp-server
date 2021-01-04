@@ -1,4 +1,4 @@
-import ABSector from '../models/autoBlock/modelAutoBlockSector';
+import ModelAutoBlockSector from 'app/schema/autoBlock/modelAutoBlockSector';
 
 const autoBlockSectors: any[] = [
     {locoNetId: 700},
@@ -46,16 +46,16 @@ const autoBlockSectors: any[] = [
 
 ];
 export default class AutoBlockSectorsFactory /*extends LocoNetObjectsFactory<Message, ABSectorState> */ {
-    private readonly autoBlockSectors: ABSector[];
+    private readonly autoBlockSectors: ModelAutoBlockSector[];
 
     constructor() {
         // super();
         this.autoBlockSectors = autoBlockSectors.map((value: any) => {
-            return new ABSector(value);
+            return new ModelAutoBlockSector(value);
         });
     }
 
-    protected getObjects(): ABSector[] {
+    protected getObjects(): ModelAutoBlockSector[] {
         return this.autoBlockSectors;
     }
 }

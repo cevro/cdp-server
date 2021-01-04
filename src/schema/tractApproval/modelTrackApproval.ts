@@ -8,7 +8,7 @@ export default abstract class ModelTrackApproval extends AbstractModel<BackendAp
     public readonly approvalUId: string;
 
     protected constructor(def: { approvalId: number; approvalUId: string; }) {
-        super('track-approval');
+        super();
         this.approvalUId = def.approvalUId;
         this.approvalId = def.approvalId;
     }

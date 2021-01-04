@@ -20,7 +20,7 @@ export default abstract class ReduxConnector<S = void, D = void> {
     protected reduxPropsWillUpdate(newProps: ReduxProps<S, D>): void {
     }
 
-    protected reduxPropsDidUpdated(): void {
+    protected reduxPropsDidUpdated(oldProps: ReduxProps<S, D>): void {
     }
 
     protected connect(): void {
@@ -48,7 +48,8 @@ export default abstract class ReduxConnector<S = void, D = void> {
             dispatch: this.mapDispatch(reduxStore.dispatch),
         };
         this.reduxPropsWillUpdate(newState);
+        const oldProps = this.reduxProps;
         this.reduxProps = newState;
-        this.reduxPropsDidUpdated();
+        this.reduxPropsDidUpdated(oldProps);
     }
 }

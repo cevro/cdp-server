@@ -1,28 +1,31 @@
 import ModelSector from '../models/modelSector';
 import AbstractService from 'app/schema/services/abstractService';
-import { Connection } from 'mysql';
+import { Action, CombinedState, Dispatch } from 'redux';
+import { AppStore } from 'app/reducers';
+import { createActionWithModel, SECTOR_ACTIONS_PREFIX } from 'app/actions/models';
 
-export default class SectorService extends AbstractService<ModelSector> {
+export default class SectorService extends AbstractService<ModelSector, {}, {}> {
 
-    private readonly sectors: ModelSector[] = [];
-
-    public getAll(): ModelSector[] {
-        return this.sectors;
+    protected mapDispatch(dispatch: Dispatch<Action<string>>) {
+        return {
+            init: (modelSector: ModelSector) =>
+                dispatch(createActionWithModel(SECTOR_ACTIONS_PREFIX, 'ACTION_INIT')(modelSector)),
+            update: (modelSector: ModelSector) =>
+                dispatch(createActionWithModel(SECTOR_ACTIONS_PREFIX, 'ACTION_UPDATE')(modelSector)),
+        };
     }
 
-    public loadSchema(connection: Connection): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
-            connection.query('SELECT * FROM `sector`;', (error, results) => {
-                if (error) {
-                    reject(error);
-                    return;
-                }
-                results.forEach((row) => {
-                    const sector = new ModelSector(row);
-                    this.sectors.push(sector);
-                });
-                resolve();
-            });
-        });
+    protected mapState(state: CombinedState<AppStore>) {
+        return {
+            models: state.sectors,
+        };
+    }
+
+    protected getModelClass(): { new(row: any): ModelSector } {
+        return ModelSector;
+    }
+
+    protected getTableName(): string {
+        return 'sector';
     }
 }

@@ -1,28 +1,42 @@
 import ModelTurnout from '../models/modelTurnout';
-import { Connection } from 'mysql';
 import AbstractService from 'app/schema/services/abstractService';
+import { Action, CombinedState, Dispatch } from 'redux';
+import { AppStore } from 'app/reducers';
+import { createActionWithModel, TURNOUT_ACTIONS_PREFIX } from 'app/actions/models';
+import { BackendTurnout } from 'app/consts/interfaces/turnout';
 
-export default class TurnoutService extends AbstractService<ModelTurnout> {
+export default class TurnoutService extends AbstractService<ModelTurnout, {}, {}> {
 
-    public readonly turnouts: ModelTurnout[] = [];
+    public handleRequestChange(turnoutUId: string, position: BackendTurnout.EndPosition) {
+        const turnout = this.findByUId(turnoutUId);
 
-    public async loadSchema(connection: Connection): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
-            connection.query('SELECT * FROM `turnout`;', (error, results) => {
-                if (error) {
-                    reject(error);
-                    return;
-                }
-                results.forEach((row) => {
-                    const turnout = new ModelTurnout(row);
-                    this.turnouts.push(turnout);
-                });
-                resolve();
-            });
-        });
+        turnout.setRequestedPosition(position);
+        this.reduxProps.dispatch.update(turnout);
+        setTimeout(() => {
+            turnout.setCurrentPosition(position);
+            this.reduxProps.dispatch.update(turnout);
+        }, 2000);
     }
 
-    public getAll(): ModelTurnout[] {
-        return this.turnouts;
+    protected mapDispatch(dispatch: Dispatch<Action<string>>) {
+
+        return {
+            init: (modelTurnout: ModelTurnout) => dispatch(createActionWithModel(TURNOUT_ACTIONS_PREFIX, 'ACTION_INIT')(modelTurnout)),
+            update: (modelTurnout: ModelTurnout) => dispatch(createActionWithModel(TURNOUT_ACTIONS_PREFIX, 'ACTION_UPDATE')(modelTurnout)),
+        };
+    }
+
+    protected mapState(state: CombinedState<AppStore>) {
+        return {
+            models: state.turnouts,
+        };
+    }
+
+    protected getModelClass(): { new(row: any): ModelTurnout } {
+        return ModelTurnout;
+    }
+
+    protected getTableName(): string {
+        return 'turnout';
     }
 }

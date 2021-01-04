@@ -1,33 +1,33 @@
-import { ENTITY_SIGNAL } from 'app/consts/entity';
 import AbstractModel from 'app/schema/models/abstractModel';
 import { Aspect, BackendSignal } from 'app/consts/interfaces/signal';
-import { SignalActions } from 'app/actions/signal';
-import { Action, CombinedState, Dispatch } from 'redux';
-import { AppStore } from 'app/reducers';
-import { ReduxProps } from 'app/reduxConnector';
 
-interface DispatchObject {
-    onInit(): void;
-
-    onChangeAspect(aspect: number): void;
-
-    onRequestChange(aspect: number): void;
+interface Row {
+    signal_id: number;
+    signal_uid: string;
+    name: string;
+    loconet_id: number;
+    type: BackendSignal.Type;
+    construction: BackendSignal.Construction;
+    last_auto_block: boolean;
+    lights: string;
 }
 
-export default class ModelSignal extends AbstractModel<BackendSignal.Definition, BackendSignal.State, DispatchObject> {
+export default class ModelSignal extends AbstractModel<BackendSignal.Definition, Row> {
 
-    private readonly signalId: number;
-    private readonly signalUId: string;
-    private readonly name: string;
-    private readonly type: BackendSignal.Type;
-    private readonly construction: BackendSignal.Construction;
-    private readonly lights: BackendSignal.Light[];
-    private readonly spec: {
+    public readonly signalId: number;
+    public readonly signalUId: string;
+    public readonly name: string;
+    public readonly type: BackendSignal.Type;
+    public readonly construction: BackendSignal.Construction;
+    public readonly lights: BackendSignal.Light[];
+    public readonly spec: {
         lastAutoBlock: boolean;
     };
+    private displayedAspect: number = Aspect.UNDEFINED;
+    private requestedAspect: number | null = null;
 
-    public constructor(row: BackendSignal.Row) {
-        super(ENTITY_SIGNAL);
+    public constructor(row: Row) {
+        super();
         this.signalId = row.signal_id;
         this.signalUId = row.signal_uid;
         this.name = row.name;
@@ -38,25 +38,9 @@ export default class ModelSignal extends AbstractModel<BackendSignal.Definition,
         this.spec = {
             lastAutoBlock: row.last_auto_block,
         };
-        this.connect();
     }
 
-    protected reduxDidConnected() {
-        super.reduxDidConnected();
-        this.reduxProps.dispatch.onInit();
-        this.reduxProps.dispatch.onRequestChange(Aspect.STOP);
-    }
-
-    protected reduxPropsWillUpdate(newProps: ReduxProps<BackendSignal.State, DispatchObject>) {
-        super.reduxPropsWillUpdate(newProps);
-        if (this.reduxProps.state && newProps.state && this.reduxProps.state.requestedAspect !== newProps.state.requestedAspect) {
-            setTimeout(() => {
-                this.reduxProps.dispatch.onChangeAspect(newProps.state.requestedAspect);
-            }, 2000);
-        }
-    }
-
-    public toArray(): BackendSignal.Definition {
+    public toArray() {
         return {
             signalId: this.signalId,
             signalUId: this.signalUId,
@@ -65,6 +49,8 @@ export default class ModelSignal extends AbstractModel<BackendSignal.Definition,
             construction: this.construction,
             lights: this.lights,
             spec: this.spec,
+            requestedAspect: this.requestedAspect,
+            displayedAspect: this.displayedAspect,
         };
     }
 
@@ -72,18 +58,19 @@ export default class ModelSignal extends AbstractModel<BackendSignal.Definition,
         return this.signalUId;
     }
 
-    protected mapDispatch(dispatch: Dispatch<Action<string>>) {
-        return {
-            onInit: () => dispatch(SignalActions.init(this.getUId())),
-            onChangeAspect: (aspect: number) => dispatch(SignalActions.aspectChanged(this.getUId(), aspect)),
-            onRequestChange: (aspect: number) => dispatch(SignalActions.requestChangeAspect(this.getUId(), aspect)),
-        };
+    public getDisplayedAspect(): number {
+        return this.displayedAspect;
     }
 
-    protected mapState(store: CombinedState<AppStore>) {
-        return {
-            ...store.signals[this.getUId()],
-        };
+    public getRequestedAspect(): number | null {
+        return this.requestedAspect;
     }
 
+    public setDisplayedAspect(aspect: number): void {
+        this.displayedAspect = aspect;
+    }
+
+    public setRequestedAspect(aspect: number | null): void {
+        this.requestedAspect = aspect;
+    }
 }

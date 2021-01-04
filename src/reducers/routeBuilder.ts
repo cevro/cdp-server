@@ -56,8 +56,10 @@ export function routeBuilder<A extends Action<string>>(state: RouteBuilderState 
     const {type} = action;
     switch (type) {
         case RouteBuilderActions.ACTION_ADD_ROUTE:
+            // @ts-ignore
             return addRoute(state, action);
         case RouteBuilderActions.ACTION_CHANGE_LOCK_STATE:
+            // @ts-ignore
             return changeLockState(state, action);
         default:
             return state;
