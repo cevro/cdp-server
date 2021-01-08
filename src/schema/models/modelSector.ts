@@ -1,7 +1,6 @@
 import AbstractModel from 'app/schema/models/abstractModel';
 import { BackendSector } from 'app/consts/interfaces/sector';
-import { Action, CombinedState, Dispatch } from 'redux';
-import { AppStore } from 'app/reducers';
+import SerialConnector from 'app/serialConnector';
 
 interface Row {
     sector_id: number;
@@ -15,30 +14,30 @@ export default class ModelSector extends AbstractModel<BackendSector.Definition,
     private readonly sectorId: number;
     private readonly sectorUId: string;
 
-    private locked: boolean = false;
-    private occupied: boolean = false;
+    private _locked: boolean = false;
+    private _occupied: boolean = false;
 
-    constructor(row: Row) {
-        super();
+    public constructor(serial: SerialConnector, row: Row) {
+        super(serial);
         this.name = row.name;
         this.sectorId = row.sector_id;
         this.sectorUId = row.sector_uid;
     }
 
-    public setOccupied(state: boolean): void {
-        this.occupied = state;
+    public set occupied(state: boolean) {
+        this._occupied = state;
     }
 
-    public setLocked(state: boolean): void {
-        this.locked = state;
+    public set locked(state: boolean) {
+        this._locked = state;
     }
 
-    public getOccupied(): boolean {
-        return this.occupied;
+    public get occupied(): boolean {
+        return this._occupied;
     }
 
-    public getLocked(): boolean {
-        return this.locked;
+    public get locked(): boolean {
+        return this._locked;
     }
 
     public getUId(): string {
@@ -53,11 +52,5 @@ export default class ModelSector extends AbstractModel<BackendSector.Definition,
             locked: this.locked,
             occupied: this.occupied,
         };
-    }
-
-    protected mapDispatch(dispatch: Dispatch<Action<string>>): any {
-    }
-
-    protected mapState(state: CombinedState<AppStore>): any {
     }
 }

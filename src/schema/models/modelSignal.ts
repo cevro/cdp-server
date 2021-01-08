@@ -1,5 +1,6 @@
 import AbstractModel from 'app/schema/models/abstractModel';
 import { Aspect, BackendSignal } from 'app/consts/interfaces/signal';
+import SerialConnector, { SerialMessage } from 'app/serialConnector';
 
 interface Row {
     signal_id: number;
@@ -23,11 +24,12 @@ export default class ModelSignal extends AbstractModel<BackendSignal.Definition,
     public readonly spec: {
         lastAutoBlock: boolean;
     };
-    private displayedAspect: number = Aspect.UNDEFINED;
-    private requestedAspect: number | null = null;
 
-    public constructor(row: Row) {
-        super();
+    private _displayedAspect: number = Aspect.UNDEFINED;
+    private _requestedAspect: number | null = null;
+
+    public constructor(serial: SerialConnector, row: Row) {
+        super(serial);
         this.signalId = row.signal_id;
         this.signalUId = row.signal_uid;
         this.name = row.name;
@@ -38,6 +40,45 @@ export default class ModelSignal extends AbstractModel<BackendSignal.Definition,
         this.spec = {
             lastAutoBlock: row.last_auto_block,
         };
+        this.getContainer().emit('@signal/model-created');
+        this.getContainer().on('@serial/message-receive', (message: SerialMessage) => {
+            if (message.uId !== this.getUId()) {
+                return;
+            }
+            switch (message.type) {
+                case 'a':
+                    this.displayedAspect = message.value;
+            }
+
+        });
+    }
+
+    public get displayedAspect(): number {
+        return this._displayedAspect;
+    }
+
+    public get requestedAspect(): number | null {
+        return this._requestedAspect;
+    }
+
+    public set displayedAspect(aspect: number) {
+        if (this.displayedAspect === aspect) {
+            return;
+        }
+
+        if (this.requestedAspect !== null && this.requestedAspect !== aspect) {
+            // this.serial.send(this.toSerialMessage(aspect));
+        }
+        this._requestedAspect = null;
+        this._displayedAspect = aspect;
+        this.getContainer().emit('@signal/aspect-changed', this);
+
+    }
+
+    public set requestedAspect(aspect: number | null) {
+        this._requestedAspect = aspect;
+        this.serial.send(this.toSerialMessage(aspect));
+        this.getContainer().emit('@signal/aspect-requested', this);
     }
 
     public toArray() {
@@ -58,19 +99,11 @@ export default class ModelSignal extends AbstractModel<BackendSignal.Definition,
         return this.signalUId;
     }
 
-    public getDisplayedAspect(): number {
-        return this.displayedAspect;
-    }
-
-    public getRequestedAspect(): number | null {
-        return this.requestedAspect;
-    }
-
-    public setDisplayedAspect(aspect: number): void {
-        this.displayedAspect = aspect;
-    }
-
-    public setRequestedAspect(aspect: number | null): void {
-        this.requestedAspect = aspect;
+    private toSerialMessage(aspect: number): SerialMessage {
+        return {
+            uId: this.getUId(),
+            type: 'a',
+            value: aspect,
+        };
     }
 }

@@ -1,38 +1,27 @@
 import { BadRequestError, NotFoundError } from 'restify-errors';
-import SignalService from 'app/schema/services/signalService';
+import ServiceSignal from 'app/schema/services/serviceSignal';
 import { Next, Request, Response } from 'restify';
-import SectorService from 'app/schema/services/sectorService';
-import TurnoutService from 'app/schema/services/turnoutService';
-import ReduxConnector from 'app/reduxConnector';
-import { Action, CombinedState, Dispatch } from 'redux';
-import { AppStore } from 'app/reducers';
-import { RouteBuilderActions } from 'app/actions/routeBuilder';
-import { BackendRouteLock } from 'app/consts/interfaces/routeLock';
-import BuildOptions = BackendRouteLock.BuildOptions;
-import RouteService from 'app/routes/routeService';
+import ServiceSector from 'app/schema/services/serviceSector';
+import ServiceTurnout from 'app/schema/services/serviceTurnout';
+import ServiceRoute from 'app/schema/services/serviceRoute';
 
-export default class Handler extends ReduxConnector<any, {
-    // ;
-    onAddRoute(routeUId: string, buildOptions: BuildOptions): void;
-}> {
+export default class Handler {
 
-    private readonly sectorService: SectorService;
-    private readonly turnoutService: TurnoutService;
-    private readonly routeService: RouteService;
-    private readonly signalService: SignalService;
+    private readonly serviceSector: ServiceSector;
+    private readonly serviceTurnout: ServiceTurnout;
+    private readonly serviceRoute: ServiceRoute;
+    private readonly serviceSignal: ServiceSignal;
 
     constructor(
-        signalService: SignalService,
-        sectorService: SectorService,
-        turnoutService: TurnoutService,
-        routeService: RouteService,
+        serviceSignal: ServiceSignal,
+        serviceSector: ServiceSector,
+        serviceTurnout: ServiceTurnout,
+        serviceRoute: ServiceRoute,
     ) {
-        super();
-        this.sectorService = sectorService;
-        this.turnoutService = turnoutService;
-        this.routeService = routeService;
-        this.signalService = signalService;
-        this.connect();
+        this.serviceSector = serviceSector;
+        this.serviceTurnout = serviceTurnout;
+        this.serviceRoute = serviceRoute;
+        this.serviceSignal = serviceSignal;
     }
 
     public requestChangeSignal(req: Request, res: Response, next: Next) {
@@ -41,13 +30,13 @@ export default class Handler extends ReduxConnector<any, {
         if (!body.hasOwnProperty('aspect')) {
             return next(new BadRequestError('Param aspect is not included'));
         }
-        this.signalService.handleRequestChange(req.params.signalId, body.aspect);
+        this.serviceSignal.findByUId(req.params.signalId).requestedAspect = body.aspect;
         res.send(JSON.stringify({message: 'Done'}));
         next(false);
     }
 
     public requestChangeSector(req: Request, res: Response, next: Next) {
-        const sector = this.sectorService.findByUId(req.params.sectorId);
+        const sector = this.serviceSector.findByUId(req.params.sectorId);
         if (!sector) {
             return next(new NotFoundError('Sector ' + req.params.sectorId + ' no found'));
         }
@@ -65,7 +54,7 @@ export default class Handler extends ReduxConnector<any, {
             if (!body.hasOwnProperty('position')) {
                 return next(new BadRequestError('Param position is not included'));
             }
-            this.turnoutService.handleRequestChange(req.params.turnoutId, body.position);
+            // this.turnoutService.handleRequestChange(req.params.turnoutId, body.position);
         } catch (e) {
             return next(e);
         }
@@ -75,7 +64,7 @@ export default class Handler extends ReduxConnector<any, {
     }
 
     public async requestRouteBuild(req: Request, res: Response, next: Next) {
-        const route = this.routeService.findByUId(req.params.routeId);
+        const route = this.serviceRoute.findByUId(req.params.routeId);
         if (!route) {
             return next(new NotFoundError('Route ' + req.params.route + ' no found'));
         }
@@ -83,20 +72,8 @@ export default class Handler extends ReduxConnector<any, {
         if (!body.hasOwnProperty('buildOptions')) {
             return next(new BadRequestError('Param buildOptions is not included'));
         }
-        this.reduxProps.dispatch.onAddRoute(route.getUId(), body.buildOptions);
+        //  this.reduxProps.dispatch.onAddRoute(route.getUId(), body.buildOptions);
         res.send(JSON.stringify({message: 'Done'}));
         next(false);
-    }
-
-    protected mapDispatch(dispatch: Dispatch<Action<string>>) {
-        return {
-            /*   onRequestTurnoutChange: (turnoutUId: string, position: BackendTurnout.EndPosition) =>
-                   dispatch(TurnoutActions.requestChangePosition(turnoutUId, position)),*/
-            onAddRoute: (routeUId: string, buildOptions: BuildOptions) => dispatch(RouteBuilderActions.addRoute(routeUId, buildOptions)),
-        };
-    }
-
-    protected mapState(store: CombinedState<AppStore>) {
-        return {};
     }
 }

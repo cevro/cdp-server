@@ -1,6 +1,12 @@
 import { Connection } from 'mysql';
 import { BackendTurnout } from 'app/consts/interfaces/turnout';
-import ModelRoute, { BackendRoute } from 'app/routes/modelRoute';
+import ServiceSignal from 'app/schema/services/serviceSignal';
+import ServiceSector from 'app/schema/services/serviceSector';
+import ServiceTurnout from 'app/schema/services/serviceTurnout';
+import AbstractService from 'app/schema/services/abstractService';
+import serialConnector from 'app/serialConnector';
+import SerialConnector from 'app/serialConnector';
+import ModelRoute, { BackendRoute } from 'app/schema/models/modelRoute';
 
 export interface TrainRouteDefinition {
     id: number;
@@ -90,7 +96,7 @@ const routes: TrainRouteDefinition[] = [
         startSignalId: 'zst.pu.a.1L',
         endSignalId: 'zst.pu.a.Lc3',
         endSectorId: 3010,
-        speed: 40,
+        speed: '40',
         sufficientDistance: true,
     },
     {
@@ -106,7 +112,7 @@ const routes: TrainRouteDefinition[] = [
         startSignalId: 'zst.pu.a.Lc3',
         endSignalId: 'zst.pu.a.L3a',
         endSectorId: 3110,
-        speed: 40,
+        speed: '40',
         sufficientDistance: false,
     },
     {
@@ -132,7 +138,7 @@ const routes: TrainRouteDefinition[] = [
         startSignalId: 'zst.pu.a.L3a',
         endSignalId: null,
         endSectorId: 102,
-        speed: 40,
+        speed: '40',
         sufficientDistance: true,
     },
     {
@@ -155,7 +161,7 @@ const routes: TrainRouteDefinition[] = [
         startSignalId: 'zst.pu.a.L3a',
         endSignalId: null,
         endSectorId: 102,
-        speed: 40,
+        speed: '40',
         sufficientDistance: true,
     },
     {
@@ -171,35 +177,35 @@ const routes: TrainRouteDefinition[] = [
         startSignalId: 'zst.pu.a.Sc3a',
         endSignalId: 'zst.pu.a.S3',
         endSectorId: 3010,
-        speed: 40,
+        speed: '40',
         sufficientDistance: false,
     },
 ];
 
-export default class RouteService {
+export default class ServiceRoute extends AbstractService<ModelRoute> {
 
-    private routes: ModelRoute[]=[];
+    private readonly serviceSignal: ServiceSignal;
+    private readonly serviceSector: ServiceSector;
+    private readonly serviceTurnout: ServiceTurnout;
 
-    public findRoute(startSignalUId: string, endSignalUId: string): ModelRoute[] {
-        return this.routes.filter((route) => {
-            // return (route.startSignal.getUId() === startSignalUId) && (route.endSignal.getUId());
-        });
-    }
-
-    public findByUId(uId: string): ModelRoute {
-        const candidates = this.getAll().filter((model) => {
-            return model.getUId() === uId;
-        });
-        if (candidates.length !== 1) {
-            throw Error('Cannot find a model');
-        }
-        return candidates[0];
+    public constructor(
+        serviceSignal: ServiceSignal,
+        serviceSector: ServiceSector,
+        serviceTurnout: ServiceTurnout,
+        serial: SerialConnector,
+    ) {
+        super(serial);
+        this.serviceSignal = serviceSignal;
+        this.serviceSector = serviceSector;
+        this.serviceTurnout = serviceTurnout;
     }
 
     public loadSchema(connection: Connection): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            this.routes = routes.map((def) => {
-                return new ModelRoute(
+            routes.forEach((def) => {
+
+                const route = new ModelRoute(
+                    this.serial,
                     {
                         route_id: def.id,
                         route_uid: def.name,
@@ -208,20 +214,25 @@ export default class RouteService {
                         sufficient_distance: def.sufficientDistance ? def.sufficientDistance : false,
                     },
                     def,
-                    def.startSignalId,
-                    def.endSignalId,
+                    this.serviceSignal.findByUId(def.startSignalId),
+                    def.endSignalId ? this.serviceSignal.findByUId(def.endSignalId) : null,
                     def.turnoutPositions.map(pos => {
-                        return {turnoutUId: pos[0], position: pos[1]};
+                        return {turnout: this.serviceTurnout.findByUId(pos[0]), position: pos[1]};
                     }),
-                    def.sectorIds,
+                    def.sectorIds.map((sectorId) => this.serviceSector.findByUId(sectorId)),
                     null,
                 );
+                this.models[route.getUId()] = route;
             });
             resolve();
         });
     }
 
-    public getAll() {
-        return this.routes;
+    protected getModelClass(): new (serial: serialConnector, row: any) => ModelRoute {
+        throw ModelRoute;
+    }
+
+    protected getTableName(): string {
+        throw 'route';
     }
 }

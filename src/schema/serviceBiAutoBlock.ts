@@ -1,6 +1,6 @@
 import ModelBiAutoBlock from 'app/schema/autoBlock/modelBiAutoBlock';
 
-export default class BiAutoBlockService /*extends LocoNetObjectsFactory<Message, BiDirABState> */ {
+export default class ServiceBiAutoBlock /*extends LocoNetObjectsFactory<Message, BiDirABState> */ {
     private readonly biDirABs: ModelBiAutoBlock[];
 
     constructor() {

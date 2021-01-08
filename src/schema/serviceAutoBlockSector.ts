@@ -45,13 +45,13 @@ const autoBlockSectors: any[] = [
     {locoNetId: 739},
 
 ];
-export default class AutoBlockSectorsFactory /*extends LocoNetObjectsFactory<Message, ABSectorState> */ {
+export default class ServiceAutoBlockSector /*extends LocoNetObjectsFactory<Message, ABSectorState> */ {
     private readonly autoBlockSectors: ModelAutoBlockSector[];
 
     constructor() {
         // super();
         this.autoBlockSectors = autoBlockSectors.map((value: any) => {
-            return new ModelAutoBlockSector(value);
+            return new ModelAutoBlockSector(null, value);
         });
     }
 

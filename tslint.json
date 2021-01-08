@@ -94,9 +94,31 @@
     ],
     "member-ordering": [
       true,
-      "public-before-private",
-      "static-before-instance",
-      "variables-before-functions"
+      {
+        "order": [
+          "public-static-field",
+          "protected-static-field",
+          "private-static-field",
+          "public-instance-field",
+          "protected-instance-field",
+          "private-instance-field",
+          "public-constructor",
+          "protected-constructor",
+          "private-constructor",
+          "public-static-accessor",
+          "protected-static-accessor",
+          "private-static-accessor",
+          "public-instance-accessor",
+          "protected-instance-accessor",
+          "private-instance-accessor",
+          "public-instance-method",
+          "public-static-method",
+          "protected-instance-method",
+          "protected-static-method",
+          "private-instance-method",
+          "private-static-method"
+        ]
+      }
     ],
     "no-console": [
       false,

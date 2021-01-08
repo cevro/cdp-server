@@ -1,21 +1,18 @@
 import { Aspect } from 'app/consts/interfaces/signal';
-import { BackendRouteLock } from 'app/consts/interfaces/routeLock';
-import BuildOptions = BackendRouteLock.BuildOptions;
-import ModelRoute from 'app/routes/modelRoute';
-import ModelSignal from 'app/schema/models/modelSignal';
+import ModelRoute from 'app/schema/models/modelRoute';
 
 export default class AspectStrategy {
 
-    public static calculate(buildOptions: BuildOptions, route: ModelRoute, endSignal: ModelSignal | null): number {
+    public static calculate(route: ModelRoute): number {
 
-        let endSignalId = endSignal ? endSignal.getDisplayedAspect() : Aspect.CLEAR;
-        if (buildOptions.PN) {
+        let endSignalId = route.endSignal ? route.endSignal.displayedAspect : Aspect.CLEAR;
+        if (route.buildOptions.PN) {
             return Aspect.PN;
         }
-        if (buildOptions.alert) {
+        if (route.buildOptions.alert) {
             endSignalId = Aspect.STOP;
         }
-        if (route.speed !== null || buildOptions['40']) {
+        if (route.speed !== null || route.buildOptions['40']) {
             return this.calculateReduceSpeed40(endSignalId, route.sufficientDistance);
         } else {
             return this.calculateStraight(endSignalId, route.sufficientDistance);

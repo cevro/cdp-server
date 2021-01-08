@@ -1,19 +1,18 @@
 import AbstractModel from 'app/schema/models/abstractModel';
 import { Connection } from 'mysql';
-import ReduxConnector from 'app/reduxConnector';
 import { MapObjects } from 'app/consts/messages';
+import { EventsConnector } from 'app/glogalEvents/eventCollector';
+import SerialConnector from 'app/serialConnector';
 
-export default abstract class AbstractService<M extends AbstractModel<A, R>, S = void, D = void, A = {}, R = any>
-    extends ReduxConnector<S & {
-        models: MapObjects<M>;
-    }, D & {
-        init(model: M): void;
-        update(model: M): void;
-    }> {
+export default abstract class AbstractService<M extends AbstractModel<A, R>, A = {}, R = any> extends EventsConnector {
 
-    constructor() {
+    protected models: MapObjects<M> = {};
+
+    protected readonly serial: SerialConnector;
+
+    constructor(serial: SerialConnector) {
         super();
-        this.connect();
+        this.serial = serial;
     }
 
     public findByUId(uId: string): M {
@@ -31,8 +30,8 @@ export default abstract class AbstractService<M extends AbstractModel<A, R>, S =
                     return;
                 }
                 results.forEach((row: R) => {
-                    const sector = new (this.getModelClass())(row);
-                    this.reduxProps.dispatch.init(sector);
+                    const model = new (this.getModelClass())(this.serial, row);
+                    this.models[model.getUId()] = model;
                 });
                 resolve();
             });
@@ -40,10 +39,10 @@ export default abstract class AbstractService<M extends AbstractModel<A, R>, S =
     }
 
     public getAll(): MapObjects<M> {
-        return this.reduxProps.state.models;
+        return this.models;
     }
 
-    protected abstract getModelClass(): new(row: R) => M;
+    protected abstract getModelClass(): new(serial: SerialConnector, row: R) => M;
 
     protected abstract getTableName(): string;
 }

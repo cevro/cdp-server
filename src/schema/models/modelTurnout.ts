@@ -1,6 +1,6 @@
 import AbstractModel from 'app/schema/models/abstractModel';
 import { BackendTurnout } from 'app/consts/interfaces/turnout';
-import { Action, Dispatch } from 'redux';
+import SerialConnector from 'app/serialConnector';
 
 interface Row {
     turnout_id: number;
@@ -16,35 +16,47 @@ export default class ModelTurnout extends AbstractModel<BackendTurnout.Definitio
     private readonly turnoutId: number;
     private readonly basePosition: BackendTurnout.EndPosition;
 
-    private currentPosition: BackendTurnout.Position = 'U';
-    private requestedPosition: BackendTurnout.EndPosition | null = null;
+    private _currentPosition: BackendTurnout.Position = 'U';
+    private _requestedPosition: BackendTurnout.EndPosition | null = null;
 
-    constructor(row: Row) {
-        super();
+    private _locked: boolean = false;
+
+    public constructor(serial: SerialConnector, row: Row) {
+        super(serial);
         this.name = row.name;
         this.turnoutId = row.turnout_id;
         this.turnoutUId = row.turnout_uid;
         this.basePosition = row.base_position;
+        this.getContainer().emit('@turnout/model-created');
     }
 
-    public setCurrentPosition(position: BackendTurnout.Position): void {
-        this.currentPosition = position;
+    public set currentPosition(position: BackendTurnout.Position) {
+        this._currentPosition = position;
+        this.getContainer().emit('@turnout/position-changed');
     }
 
-    public setRequestedPosition(position: BackendTurnout.EndPosition): void {
-        this.requestedPosition = position;
+    public set requestedPosition(position: BackendTurnout.EndPosition) {
+        this._requestedPosition = position;
+        this.getContainer().emit('@turnout/position-requested');
+        setTimeout(() => {
+            this.currentPosition = position;
+        }, 2000);
     }
 
-    public getCurrentPosition(): BackendTurnout.Position {
-        return this.currentPosition;
+    public get currentPosition(): BackendTurnout.Position {
+        return this._currentPosition;
     }
 
-    public getRequestedPosition(): BackendTurnout.EndPosition {
-        return this.requestedPosition;
+    public get requestedPosition(): BackendTurnout.EndPosition {
+        return this._requestedPosition;
     }
 
-    public isLocked(): boolean {
-        return false;
+    public get locked(): boolean {
+        return this._locked;
+    }
+
+    public set locked(state: boolean) {
+        this._locked = state;
     }
 
     public toArray() {
@@ -62,17 +74,4 @@ export default class ModelTurnout extends AbstractModel<BackendTurnout.Definitio
         return this.turnoutUId;
     }
 
-    protected mapDispatch(dispatch: Dispatch<Action<string>>) {
-        return;
-        /*  return {
-              onInit: () => dispatch(TurnoutActions.init(this.getUId())),
-              onChangePosition: (position: BackendTurnout.Position) =>
-                  dispatch(TurnoutActions.positionChanged(this.getUId(), position)),
-              onRequestChangePosition: (position: BackendTurnout.EndPosition) =>
-                  dispatch(TurnoutActions.requestChangePosition(this.getUId(), position)),
-          };*/
-    }
-
-    protected mapState(state) {
-    }
 }

@@ -1,6 +1,7 @@
 interface SerialMap {
     [uId: string]: number;
 }
+
 export class SerialMapping {
     private static serialMap: SerialMap = {
         'zst.pu.a.1S': 517,
@@ -39,12 +40,18 @@ export class SerialMapping {
         'ab.pu-lpm.a.1-115': 535,
         'ab.pu-lpm.a.2-115': 534,
     };
+
+    public constructor() {
+        throw Error('Static class');
+    }
+
     public static getSerialId(uId: string): number | null {
         if (this.serialMap.hasOwnProperty(uId)) {
             return this.serialMap[uId];
         }
         return null;
     }
+
     public static getUId(id: number): string | null {
         for (const key in this.serialMap) {
             if (this.serialMap.hasOwnProperty(key)) {
@@ -54,8 +61,5 @@ export class SerialMapping {
             }
         }
         return null;
-    }
-    public constructor() {
-        throw Error('Static class');
     }
 }

@@ -1,6 +1,5 @@
 import AbstractModel from 'app/schema/models/abstractModel';
-import { AppStore } from 'app/reducers';
-import { CombinedState, Dispatch, Action } from 'redux';
+import SerialConnector from 'app/serialConnector';
 
 export default class ModelAutoBlockSector extends AbstractModel<{
     active: boolean;
@@ -16,8 +15,8 @@ export default class ModelAutoBlockSector extends AbstractModel<{
     public active: number;
     public blockCondition: number;
 
-    constructor(data: any) {
-        super();
+    constructor(serial: SerialConnector, data: any) {
+        super(serial);
         this.state = -1;
         this.error = -1;
         this.active = -1;
@@ -58,8 +57,4 @@ export default class ModelAutoBlockSector extends AbstractModel<{
             // console.log(this);
         }*/
 
-    protected mapState(state: CombinedState<AppStore>) {
-    }
-    protected mapDispatch(dispatch: Dispatch<Action<string>>) {
-    }
 }

@@ -2,16 +2,29 @@ import { server } from 'websocket';
 import { WebSocketStateUpdateMessage } from '@definitions/messages';
 import * as http from 'http';
 import { config } from 'app/config.local';
-import { Action, CombinedState, Dispatch } from 'redux';
-import { AppStore } from 'app/reducers';
-import ReduxConnector from 'app/reduxConnector';
+import { EventsConnector } from 'app/glogalEvents/eventCollector';
+import ServiceSignal from 'app/schema/services/serviceSignal';
+import ServiceSector from 'app/schema/services/serviceSector';
+import ServiceTurnout from 'app/schema/services/serviceTurnout';
 
-export class WebSocketServer extends ReduxConnector<AppStore, void> {
+export class WebSocketServer extends EventsConnector {
 
     private readonly wsServer: server;
 
-    constructor() {
+    private readonly serviceSignal: ServiceSignal;
+    private readonly serviceSector: ServiceSector;
+    private readonly serviceTurnout: ServiceTurnout;
+
+    public constructor(
+        serviceSignal: ServiceSignal,
+        serviceSector: ServiceSector,
+        serviceTurnout: ServiceTurnout,
+    ) {
         super();
+        this.serviceSignal = serviceSignal;
+        this.serviceSector = serviceSector;
+        this.serviceTurnout = serviceTurnout;
+
         const httpServer = http.createServer((request, response) => {
             // console.log((new Date()) + ' Received request for ' + request.url);
             response.writeHead(404);
@@ -25,7 +38,7 @@ export class WebSocketServer extends ReduxConnector<AppStore, void> {
             httpServer: httpServer,
             autoAcceptConnections: false,
         });
-        this.connect();
+        this.registerListeners();
     }
 
     public run() {
@@ -36,17 +49,14 @@ export class WebSocketServer extends ReduxConnector<AppStore, void> {
         });
     }
 
-    public reduxPropsDidUpdated(oldProps) {
-        super.reduxPropsDidUpdated(oldProps);
-        this.logChange();
-    }
-
-    protected mapState(state: CombinedState<AppStore>) {
-        return state;
-    }
-
-    protected mapDispatch(dispatch: Dispatch<Action<string>>) {
-        return;
+    private registerListeners(): void {
+        const events = ['@signal/model-created', '@signal/aspect-changed', '@signal/aspect-requested'];
+        events.forEach((event) => {
+            this.getContainer().on(event, () => {
+                console.log(event);
+                this.logChange();
+            });
+        });
     }
 
     private logChange(): void {
@@ -58,7 +68,7 @@ export class WebSocketServer extends ReduxConnector<AppStore, void> {
     private mapStateToMessage(): WebSocketStateUpdateMessage {
         return {
             store: {
-                ...this.reduxProps.state,
+                signals: this.serviceSignal.getAll(),
             },
         };
     }

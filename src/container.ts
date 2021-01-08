@@ -1,43 +1,38 @@
-import SignalService from 'app/schema/services/signalService';
-import TurnoutService from 'app/schema/services/turnoutService';
+import ServiceSignal from 'app/schema/services/serviceSignal';
+import ServiceTurnout from 'app/schema/services/serviceTurnout';
 import { Connection } from 'mysql';
 import * as mysql from 'mysql';
 import { config } from 'app/config.local';
 import { WebSocketServer } from 'app/server/webSocketServer';
 import AbstractService from 'app/schema/services/abstractService';
 import RestServer from 'app/server/restServer';
-import SectorService from 'app/schema/services/sectorService';
+import ServiceSector from 'app/schema/services/serviceSector';
 import Handler from 'app/server/handlers/handler';
-import RouteBuilder from 'app/routes/routeBuilder';
-import { CombinedState, createStore, Store } from 'redux';
-import { app, AppStore } from 'app/reducers';
-import RouteService from 'app/routes/routeService';
+import RouteLockBuffer from 'app/routes/routeLockBuffer';
 import SerialConnector from 'app/serialConnector';
+import ServiceRoute from 'app/schema/services/serviceRoute';
 
 class Container {
 
-    private reduxStore: Store<CombinedState<AppStore>>;
+    private serviceSignal: ServiceSignal;
+    private serviceTurnout: ServiceTurnout;
+    private serviceSector: ServiceSector;
+    private serviceRoute: ServiceRoute;
 
-    private signalService: SignalService;
-    private turnoutService: TurnoutService;
-    private sectorService: SectorService;
-    private routeService: RouteService;
     private serialConnector: SerialConnector;
-
-    private routeBuilder: RouteBuilder;
-
+    private routeBuilder: RouteLockBuffer;
     private schemaConnection: mysql.Connection;
 
     private webSocketServer: WebSocketServer;
     private restServer: RestServer;
 
-    public async getRouteBuilder(): Promise<RouteBuilder> {
+    public async getRouteBuilder(): Promise<RouteLockBuffer> {
         if (!this.routeBuilder) {
-            this.routeBuilder = new RouteBuilder(
-                (await this.getRouteService()),
-                (await this.getSignalService()),
-                (await this.getSectorService()),
-                (await this.getTurnoutService()),
+            this.routeBuilder = new RouteLockBuffer(
+                (await this.getServiceRoute()),
+                (await this.getServiceSignal()),
+                (await this.getServiceSector()),
+                (await this.getServiceTurnout()),
             );
         }
         return this.routeBuilder;
@@ -50,37 +45,41 @@ class Container {
         return this.serialConnector;
     }
 
-    public async getSignalService(): Promise<SignalService> {
-        if (!this.signalService) {
-            this.signalService = new SignalService();
-            await this.registerEntityService(this.signalService);
+    public async getServiceSignal(): Promise<ServiceSignal> {
+        if (!this.serviceSignal) {
+            this.serviceSignal = new ServiceSignal((await this.getSerialConnector()));
+            await this.registerEntityService(this.serviceSignal);
         }
-        return this.signalService;
+        return this.serviceSignal;
     }
 
-    public async getTurnoutService(): Promise<TurnoutService> {
-        if (!this.turnoutService) {
-            this.turnoutService = new TurnoutService();
-            await this.registerEntityService(this.turnoutService);
+    public async getServiceTurnout(): Promise<ServiceTurnout> {
+        if (!this.serviceTurnout) {
+            this.serviceTurnout = new ServiceTurnout((await this.getSerialConnector()));
+            await this.registerEntityService(this.serviceTurnout);
         }
-        return this.turnoutService;
+        return this.serviceTurnout;
     }
 
-    public async getSectorService(): Promise<SectorService> {
-        if (!this.sectorService) {
-            this.sectorService = new SectorService();
-            await this.registerEntityService(this.sectorService);
+    public async getServiceSector(): Promise<ServiceSector> {
+        if (!this.serviceSector) {
+            this.serviceSector = new ServiceSector((await this.getSerialConnector()));
+            await this.registerEntityService(this.serviceSector);
         }
-        return this.sectorService;
+        return this.serviceSector;
     }
 
-    public async getRouteService(): Promise<RouteService> {
-        if (!this.routeService) {
-            this.routeService = new RouteService();
-            await this.routeService.loadSchema(this.getSchemaConnection());
-            //   await this.registerEntityService(this.routeService);
+    public async getServiceRoute(): Promise<ServiceRoute> {
+        if (!this.serviceRoute) {
+            this.serviceRoute = new ServiceRoute(
+                (await this.getServiceSignal()),
+                (await this.getServiceSector()),
+                (await this.getServiceTurnout()),
+                (await this.getSerialConnector()),
+            );
+            await this.registerEntityService(this.serviceRoute);
         }
-        return this.routeService;
+        return this.serviceRoute;
     }
 
     public getSchemaConnection(): Connection {
@@ -92,16 +91,13 @@ class Container {
 
     public async getWebSocketServer(): Promise<WebSocketServer> {
         if (!this.webSocketServer) {
-            this.webSocketServer = new WebSocketServer();
+            this.webSocketServer = new WebSocketServer(
+                (await this.getServiceSignal()),
+                (await this.getServiceSector()),
+                (await this.getServiceTurnout()),
+            );
         }
         return this.webSocketServer;
-    }
-
-    public getReduxStore(): Store<CombinedState<AppStore>> {
-        if (!this.reduxStore) {
-            this.reduxStore = createStore(app/*, applyMiddleware(logger)*/);
-        }
-        return this.reduxStore;
     }
 
     public async getRestServer(): Promise<RestServer> {
@@ -109,10 +105,10 @@ class Container {
             this.restServer = new RestServer();
 
             const handler = new Handler(
-                (await this.getSignalService()),
-                (await this.getSectorService()),
-                (await this.getTurnoutService()),
-                (await this.getRouteService()),
+                (await this.getServiceSignal()),
+                (await this.getServiceSector()),
+                (await this.getServiceTurnout()),
+                (await this.getServiceRoute()),
             );
             this.restServer.server.post('/signal/:signalId', (...args) => handler.requestChangeSignal(...args));
 
