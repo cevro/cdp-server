@@ -1,6 +1,6 @@
 import AbstractModel from 'app/schema/models/abstractModel';
 import { BackendTurnout } from 'app/consts/interfaces/turnout';
-import SerialConnector from 'app/serialConnector';
+import { Actions } from 'app/actions';
 
 interface Row {
     turnout_id: number;
@@ -21,23 +21,23 @@ export default class ModelTurnout extends AbstractModel<BackendTurnout.Definitio
 
     private _locked: boolean = false;
 
-    public constructor(serial: SerialConnector, row: Row) {
-        super(serial);
+    public constructor(row: Row) {
+        super();
         this.name = row.name;
         this.turnoutId = row.turnout_id;
         this.turnoutUId = row.turnout_uid;
         this.basePosition = row.base_position;
-        this.getContainer().emit('@turnout/model-created');
+        this.getContainer().emit(Actions.Turnout.MODEL_CREATED, this);
     }
 
     public set currentPosition(position: BackendTurnout.Position) {
         this._currentPosition = position;
-        this.getContainer().emit('@turnout/position-changed');
+        this.getContainer().emit(Actions.Turnout.POSITION_CHANGED, this);
     }
 
     public set requestedPosition(position: BackendTurnout.EndPosition) {
         this._requestedPosition = position;
-        this.getContainer().emit('@turnout/position-requested');
+        this.getContainer().emit(Actions.Turnout.POSITION_REQUESTED, this);
         setTimeout(() => {
             this.currentPosition = position;
         }, 2000);

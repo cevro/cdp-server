@@ -15,8 +15,8 @@ export default class ModelAutoBlockSector extends AbstractModel<{
     public active: number;
     public blockCondition: number;
 
-    constructor(serial: SerialConnector, data: any) {
-        super(serial);
+    constructor(data: any) {
+        super();
         this.state = -1;
         this.error = -1;
         this.active = -1;

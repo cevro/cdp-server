@@ -47,7 +47,7 @@ class Container {
 
     public async getServiceSignal(): Promise<ServiceSignal> {
         if (!this.serviceSignal) {
-            this.serviceSignal = new ServiceSignal((await this.getSerialConnector()));
+            this.serviceSignal = new ServiceSignal();
             await this.registerEntityService(this.serviceSignal);
         }
         return this.serviceSignal;
@@ -55,7 +55,7 @@ class Container {
 
     public async getServiceTurnout(): Promise<ServiceTurnout> {
         if (!this.serviceTurnout) {
-            this.serviceTurnout = new ServiceTurnout((await this.getSerialConnector()));
+            this.serviceTurnout = new ServiceTurnout();
             await this.registerEntityService(this.serviceTurnout);
         }
         return this.serviceTurnout;
@@ -63,7 +63,7 @@ class Container {
 
     public async getServiceSector(): Promise<ServiceSector> {
         if (!this.serviceSector) {
-            this.serviceSector = new ServiceSector((await this.getSerialConnector()));
+            this.serviceSector = new ServiceSector();
             await this.registerEntityService(this.serviceSector);
         }
         return this.serviceSector;
@@ -75,7 +75,6 @@ class Container {
                 (await this.getServiceSignal()),
                 (await this.getServiceSector()),
                 (await this.getServiceTurnout()),
-                (await this.getSerialConnector()),
             );
             await this.registerEntityService(this.serviceRoute);
         }

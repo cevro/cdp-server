@@ -1,4 +1,5 @@
 import { container } from 'app/container';
+import { eventsCollector } from 'app/glogalEvents/eventCollector';
 
 class Main {
 
@@ -7,13 +8,14 @@ class Main {
         (await container.getRouteBuilder());
         (await container.getWebSocketServer()).run();
         (await container.getRestServer()).run();
-
-        //  locoNetConnector.registerListener(autoBlockSectorFactory);
-        //    locoNetConnector.registerListener(signalFactory);
-        // locoNetConnector.registerListener(sectorFactory);
-        // locoNetConnector.registerListener(biDirAutoBlockFactory);
-        // locoNetConnector.tryConnect();
-        // console.log('run');
+// , '1L-L3', '3-3a', '3a-BE2', '3a-BE1', '3a-3'
+        setTimeout(() => {
+            eventsCollector.emit('@route-buffer/add-lock', '1L-L1', {
+                PN: false,
+                40: false,
+                alert: false,
+            });
+        }, 5000);
     }
 }
 

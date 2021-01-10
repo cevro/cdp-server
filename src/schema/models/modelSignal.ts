@@ -1,12 +1,13 @@
 import AbstractModel from 'app/schema/models/abstractModel';
 import { Aspect, BackendSignal } from 'app/consts/interfaces/signal';
-import SerialConnector, { SerialMessage } from 'app/serialConnector';
+import { SerialMessage } from 'app/serialConnector';
+import AspectStrategy from 'app/routes/aspectStrategy';
+import { Actions } from 'app/actions';
 
 interface Row {
     signal_id: number;
     signal_uid: string;
     name: string;
-    loconet_id: number;
     type: BackendSignal.Type;
     construction: BackendSignal.Construction;
     last_auto_block: boolean;
@@ -28,8 +29,8 @@ export default class ModelSignal extends AbstractModel<BackendSignal.Definition,
     private _displayedAspect: number = Aspect.UNDEFINED;
     private _requestedAspect: number | null = null;
 
-    public constructor(serial: SerialConnector, row: Row) {
-        super(serial);
+    public constructor(row: Row) {
+        super();
         this.signalId = row.signal_id;
         this.signalUId = row.signal_uid;
         this.name = row.name;
@@ -40,8 +41,8 @@ export default class ModelSignal extends AbstractModel<BackendSignal.Definition,
         this.spec = {
             lastAutoBlock: row.last_auto_block,
         };
-        this.getContainer().emit('@signal/model-created');
-        this.getContainer().on('@serial/message-receive', (message: SerialMessage) => {
+        this.getContainer().emit(Actions.Signal.MODEL_CREATED, this);
+        this.getContainer().on(Actions.Serial.MESSAGE_RECEIVE, (message: SerialMessage) => {
             if (message.uId !== this.getUId()) {
                 return;
             }
@@ -71,14 +72,13 @@ export default class ModelSignal extends AbstractModel<BackendSignal.Definition,
         }
         this._requestedAspect = null;
         this._displayedAspect = aspect;
-        this.getContainer().emit('@signal/aspect-changed', this);
-
+        this.getContainer().emit(Actions.Signal.ASPECT_CHANGED, this);
     }
 
-    public set requestedAspect(aspect: number | null) {
-        this._requestedAspect = aspect;
-        this.serial.send(this.toSerialMessage(aspect));
-        this.getContainer().emit('@signal/aspect-requested', this);
+    public set requestedAspect(aspect: number) {
+        this._requestedAspect = AspectStrategy.findAllowedSignal(this, aspect);
+        this.getContainer().emit(Actions.Serial.MESSAGE_SEND, this.toSerialMessage(aspect));
+        this.getContainer().emit(Actions.Signal.ASPECT_REQUESTED, this);
     }
 
     public toArray() {

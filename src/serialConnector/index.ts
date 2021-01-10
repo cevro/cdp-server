@@ -1,6 +1,7 @@
 import * as SerialPort from 'serialport';
 import { SerialMapping } from 'app/serialConnector/mapping';
 import { EventsConnector } from 'app/glogalEvents/eventCollector';
+import { Actions } from 'app/actions';
 
 export interface SerialMessage {
     uId: string | null;
@@ -16,6 +17,7 @@ export default class SerialConnector extends EventsConnector {
     public constructor() {
         super();
         this.tryConnect();
+        this.registerListener();
     }
 
     public tryConnect(): void {
@@ -42,6 +44,12 @@ export default class SerialConnector extends EventsConnector {
         this.connector.write(msg);
     }
 
+    private registerListener() {
+        this.getContainer().on(Actions.Serial.MESSAGE_SEND, (message: SerialMessage) => {
+            this.send(message);
+        });
+    }
+
     private dateReceive(): void {
         const parser = new SerialPort.parsers.Readline({
             delimiter: '\r\n',
@@ -66,7 +74,7 @@ export default class SerialConnector extends EventsConnector {
             value: +value,
         };
 
-        this.getContainer().emit('@serial/message-receive', message);
+        this.getContainer().emit(Actions.Serial.MESSAGE_RECEIVE, message);
         return;
     }
 }

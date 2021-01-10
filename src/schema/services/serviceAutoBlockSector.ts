@@ -1,4 +1,6 @@
-import ModelAutoBlockSector from 'app/schema/autoBlock/modelAutoBlockSector';
+import AbstractService from 'app/schema/services/abstractService';
+import { Connection } from 'mysql';
+import ModelAutoBlockSector from 'app/schema/models/modelAutoBlockSector';
 
 const autoBlockSectors: any[] = [
     {locoNetId: 700},
@@ -45,17 +47,20 @@ const autoBlockSectors: any[] = [
     {locoNetId: 739},
 
 ];
-export default class ServiceAutoBlockSector /*extends LocoNetObjectsFactory<Message, ABSectorState> */ {
-    private readonly autoBlockSectors: ModelAutoBlockSector[];
+export default class ServiceAutoBlockSector extends AbstractService<ModelAutoBlockSector> {
 
-    constructor() {
-        // super();
-        this.autoBlockSectors = autoBlockSectors.map((value: any) => {
-            return new ModelAutoBlockSector(null, value);
+    public loadSchema(connection: Connection): Promise<void> {
+        autoBlockSectors.forEach((value) => {
+            this.models[value] = new ModelAutoBlockSector(value);
         });
+        return;
     }
 
-    protected getObjects(): ModelAutoBlockSector[] {
-        return this.autoBlockSectors;
+    protected getModelClass() {
+        return ModelAutoBlockSector;
+    }
+
+    protected getTableName(): string {
+        return '';
     }
 }

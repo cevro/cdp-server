@@ -5,8 +5,8 @@ import SerialConnector from 'app/serialConnector';
 export default class ModelBiAutoBlock extends AbstractModel {
     private readonly dir: BackendApproval.AvailablePosition;
 
-    constructor(serial: SerialConnector) {
-        super(serial);
+    constructor() {
+        super();
         this.dir = 'U';
     }
 

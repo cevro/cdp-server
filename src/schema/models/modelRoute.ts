@@ -1,19 +1,16 @@
 import { BackendTurnout } from 'app/consts/interfaces/turnout';
-import ModelTrackApproval from 'app/schema/tractApproval/modelTrackApproval';
 import ModelSignal from 'app/schema/models/modelSignal';
 import ModelSector from 'app/schema/models/modelSector';
 import { BackendRouteLock } from 'app/consts/interfaces/routeLock';
 import AspectStrategy from 'app/routes/aspectStrategy';
 import ModelTurnout from 'app/schema/models/modelTurnout';
 import AbstractModel from 'app/schema/models/abstractModel';
-import SerialConnector from 'app/serialConnector';
 import { TrainRouteDefinition } from 'app/schema/services/serviceRoute';
-import EndPosition = BackendTurnout.EndPosition;
-import BuildOptions = BackendRouteLock.BuildOptions;
+import ModelTrackApproval from 'app/schema/models/tractApproval/modelTrackApproval';
 
 export interface TurnoutPosition {
     turnout: ModelTurnout;
-    position: EndPosition;
+    position: BackendTurnout.EndPosition;
 }
 
 export interface ApprovalPosition {
@@ -35,10 +32,9 @@ export default class ModelRoute extends AbstractModel {
     public readonly trackApproval: ApprovalPosition | null;
     public readonly routeUId: string;
     public _state: States = 'idle';
-    public buildOptions: BuildOptions | null;
+    public buildOptions: BackendRouteLock.BuildOptions | null;
 
     constructor(
-        serial: SerialConnector,
         row: BackendRoute.Row,
         def: TrainRouteDefinition,
         startSignal: ModelSignal,
@@ -47,7 +43,7 @@ export default class ModelRoute extends AbstractModel {
         sectors: ModelSector[],
         trackApproval: ApprovalPosition | null,
     ) {
-        super(serial);
+        super();
         this.routeUId = row.route_uid;
         this.name = row.name;
         this.speed = row.speed;
@@ -69,7 +65,7 @@ export default class ModelRoute extends AbstractModel {
         this.getContainer().emit('@route/state-changed');
     }
 
-    public setBuildOptions(options: BuildOptions) {
+    public setBuildOptions(options: BackendRouteLock.BuildOptions) {
         this.buildOptions = options;
     }
 
@@ -85,7 +81,7 @@ export default class ModelRoute extends AbstractModel {
 
       }*/
 
-    public tryBuild(buildOptions: BuildOptions): boolean {
+    public tryBuild(buildOptions: BackendRouteLock.BuildOptions): boolean {
         // first check all
         if (!this.checkSectors(false, false)) {
             console.log('fail sector');

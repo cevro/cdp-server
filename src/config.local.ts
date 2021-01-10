@@ -11,5 +11,4 @@ export const config = {
     websocketServer: {
         port: 8081,
     },
-
 };

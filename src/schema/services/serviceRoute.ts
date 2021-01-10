@@ -5,7 +5,6 @@ import ServiceSector from 'app/schema/services/serviceSector';
 import ServiceTurnout from 'app/schema/services/serviceTurnout';
 import AbstractService from 'app/schema/services/abstractService';
 import serialConnector from 'app/serialConnector';
-import SerialConnector from 'app/serialConnector';
 import ModelRoute, { BackendRoute } from 'app/schema/models/modelRoute';
 
 export interface TrainRouteDefinition {
@@ -192,9 +191,8 @@ export default class ServiceRoute extends AbstractService<ModelRoute> {
         serviceSignal: ServiceSignal,
         serviceSector: ServiceSector,
         serviceTurnout: ServiceTurnout,
-        serial: SerialConnector,
     ) {
-        super(serial);
+        super();
         this.serviceSignal = serviceSignal;
         this.serviceSector = serviceSector;
         this.serviceTurnout = serviceTurnout;
@@ -205,7 +203,6 @@ export default class ServiceRoute extends AbstractService<ModelRoute> {
             routes.forEach((def) => {
 
                 const route = new ModelRoute(
-                    this.serial,
                     {
                         route_id: def.id,
                         route_uid: def.name,

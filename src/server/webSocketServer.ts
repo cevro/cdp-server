@@ -1,11 +1,15 @@
-import { server } from 'websocket';
-import { WebSocketStateUpdateMessage } from '@definitions/messages';
+import { connection, server } from 'websocket';
+import { BackendStore } from '@definitions/messages';
 import * as http from 'http';
 import { config } from 'app/config.local';
 import { EventsConnector } from 'app/glogalEvents/eventCollector';
 import ServiceSignal from 'app/schema/services/serviceSignal';
 import ServiceSector from 'app/schema/services/serviceSector';
 import ServiceTurnout from 'app/schema/services/serviceTurnout';
+import { Actions } from 'app/actions';
+import ModelSignal from 'app/schema/models/modelSignal';
+import ModelTurnout from 'app/schema/models/modelTurnout';
+import ModelSector from 'app/schema/models/modelSector';
 
 export class WebSocketServer extends EventsConnector {
 
@@ -44,32 +48,61 @@ export class WebSocketServer extends EventsConnector {
     public run() {
         this.wsServer.on('request', (request) => {
             const connection = request.accept('echo-protocol', request.origin);
-            connection.send(JSON.stringify(this.mapStateToMessage()));
-            this.logChange();
+            this.initLog(connection);
         });
     }
 
     private registerListeners(): void {
-        const events = ['@signal/model-created', '@signal/aspect-changed', '@signal/aspect-requested'];
-        events.forEach((event) => {
-            this.getContainer().on(event, () => {
+        Actions.getAll().forEach((event) => {
+            this.getContainer().on(event, (...args: any[]) => {
                 console.log(event);
-                this.logChange();
+                const data = this.mapEventToMessage(event, ...args);
+                this.wsServer.broadcast(JSON.stringify({store: data}));
             });
         });
     }
 
-    private logChange(): void {
-        if (this.wsServer) {
-            this.wsServer.broadcast(JSON.stringify(this.mapStateToMessage()));
-        }
+    private initLog(connection: connection): void {
+        connection.send(JSON.stringify({
+            store: {
+                signals: this.serviceSignal.serialise(),
+                sectors: this.serviceSector.serialise(),
+                turnouts: this.serviceTurnout.serialise(),
+                routeBuilder: {buffer: []},
+            },
+        }));
     }
 
-    private mapStateToMessage(): WebSocketStateUpdateMessage {
-        return {
-            store: {
-                signals: this.serviceSignal.getAll(),
-            },
-        };
+    private mapEventToMessage(event: string, ...args: any[]): BackendStore {
+        switch (event) {
+            case Actions.Signal.ASPECT_REQUESTED:
+            case Actions.Signal.ASPECT_CHANGED:
+            case Actions.Signal.MODEL_CREATED:
+                const signal: ModelSignal = args[0];
+                return {
+                    signals: {
+                        [signal.getUId()]: signal.toArray(),
+                    },
+                };
+            case Actions.Turnout.MODEL_CREATED:
+            case Actions.Turnout.POSITION_REQUESTED:
+            case Actions.Turnout.POSITION_CHANGED:
+                const turnout: ModelTurnout = args[0];
+                return {
+                    turnouts: {
+                        [turnout.getUId()]: turnout.toArray(),
+                    },
+                };
+            case Actions.Sector.MODEL_CREATED:
+            case Actions.Sector.LOCKED_CHANGED:
+            case Actions.Sector.OCCUPIED_CHANGED:
+                const sector: ModelSector = args[0];
+                return {
+                    sectors: {
+                        [sector.getUId()]: sector.toArray(),
+                    },
+                };
+        }
+        return {};
     }
 }

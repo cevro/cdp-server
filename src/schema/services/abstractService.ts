@@ -2,18 +2,10 @@ import AbstractModel from 'app/schema/models/abstractModel';
 import { Connection } from 'mysql';
 import { MapObjects } from 'app/consts/messages';
 import { EventsConnector } from 'app/glogalEvents/eventCollector';
-import SerialConnector from 'app/serialConnector';
 
 export default abstract class AbstractService<M extends AbstractModel<A, R>, A = {}, R = any> extends EventsConnector {
 
     protected models: MapObjects<M> = {};
-
-    protected readonly serial: SerialConnector;
-
-    constructor(serial: SerialConnector) {
-        super();
-        this.serial = serial;
-    }
 
     public findByUId(uId: string): M {
         if (this.getAll().hasOwnProperty(uId)) {
@@ -30,7 +22,7 @@ export default abstract class AbstractService<M extends AbstractModel<A, R>, A =
                     return;
                 }
                 results.forEach((row: R) => {
-                    const model = new (this.getModelClass())(this.serial, row);
+                    const model = new (this.getModelClass())(row);
                     this.models[model.getUId()] = model;
                 });
                 resolve();
@@ -42,7 +34,19 @@ export default abstract class AbstractService<M extends AbstractModel<A, R>, A =
         return this.models;
     }
 
-    protected abstract getModelClass(): new(serial: SerialConnector, row: R) => M;
+    public serialise(): MapObjects<A> {
+        const data: MapObjects<A> = {};
+        const models = this.getAll();
+        for (const uId in models) {
+            if (models.hasOwnProperty(uId)) {
+                const model = models[uId];
+                data[model.getUId()] = model.toArray();
+            }
+        }
+        return data;
+    }
+
+    protected abstract getModelClass(): new(row: R, ...attrs: any[]) => M;
 
     protected abstract getTableName(): string;
 }

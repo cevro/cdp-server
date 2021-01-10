@@ -1,5 +1,6 @@
 import { Aspect } from 'app/consts/interfaces/signal';
 import ModelRoute from 'app/schema/models/modelRoute';
+import ModelSignal from 'app/schema/models/modelSignal';
 
 export default class AspectStrategy {
 
@@ -17,6 +18,27 @@ export default class AspectStrategy {
         } else {
             return this.calculateStraight(endSignalId, route.sufficientDistance);
         }
+    }
+
+    public static canDisplayAspect(modelSignal: ModelSignal, aspect: number): boolean {
+        if (!Aspect.aspectsAttributes.hasOwnProperty(aspect)) {
+            return false;
+        }
+        const {lights} = Aspect.aspectsAttributes[aspect];
+        return lights.every((light) => {
+            return modelSignal.lights.indexOf(light) !== -1;
+        });
+    }
+
+    public static findAllowedSignal(modelSignal: ModelSignal, aspect: number): number {
+        if (this.canDisplayAspect(modelSignal, aspect)) {
+            return aspect;
+        }
+        if (!Aspect.aspectsAttributes.hasOwnProperty(aspect)) {
+            return Aspect.OFF;
+        }
+        return this.findAllowedSignal(modelSignal, Aspect.aspectsAttributes[aspect].lowerAspect);
+
     }
 
     private static calculateReduceSpeed40(endSignalId: number, sufficientDistance: boolean) {

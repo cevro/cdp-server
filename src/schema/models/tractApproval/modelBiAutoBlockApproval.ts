@@ -1,13 +1,13 @@
 import { BackendApproval } from 'app/consts/interfaces/approval';
-import ModelBiAutoBlock from 'app/schema/autoBlock/modelBiAutoBlock';
-import ModelTrackApproval from 'app/schema/tractApproval/modelTrackApproval';
+import ModelTrackApproval from 'app/schema/models/tractApproval/modelTrackApproval';
+import ModelBiAutoBlock from 'app/schema/models/modelBiAutoBlock';
 
 export default class ModelBiAutoBlockApproval extends ModelTrackApproval {
 
     public readonly autoBlock: ModelBiAutoBlock;
 
     constructor(id: number, autoBlock: ModelBiAutoBlock) {
-        super(null, {approvalId: id, approvalUId: id.toString()});
+        super({approvalId: id, approvalUId: id.toString()});
         this.autoBlock = autoBlock;
     }
 

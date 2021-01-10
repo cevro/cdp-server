@@ -4,7 +4,8 @@ interface SerialMap {
 
 export class SerialMapping {
     private static serialMap: SerialMap = {
-        'zst.pu.a.1S': 517,
+        'zst.pu.a.1L': 517,
+        /*'zst.pu.a.1S': 517,
         'ab.pu-lpm.a.1-22': 515,
         'ab.pu-lpm.a.2-22': 514,
         'ab.pu-lpm.a.1-34': 513,
@@ -38,7 +39,7 @@ export class SerialMapping {
         'ab.pu-lpm.a.1-101': 533,
         'ab.pu-lpm.a.2-101': 532,
         'ab.pu-lpm.a.1-115': 535,
-        'ab.pu-lpm.a.2-115': 534,
+        'ab.pu-lpm.a.2-115': 534,*/
     };
 
     public constructor() {

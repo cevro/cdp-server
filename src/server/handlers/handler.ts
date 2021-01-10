@@ -41,11 +41,17 @@ export default class Handler {
             return next(new NotFoundError('Sector ' + req.params.sectorId + ' no found'));
         }
         const body = JSON.parse(req.body);
-        if (!body.hasOwnProperty('state')) {
-            return next(new BadRequestError('Param state is not included'));
+        if (body.hasOwnProperty('locked')) {
+            sector.locked = body.locked;
+            res.send(JSON.stringify({message: 'Done'}));
+            return next(false);
         }
-        res.send(JSON.stringify({message: 'Done'}));
-        next(false);
+        if (body.hasOwnProperty('occupied')) {
+            sector.occupied = body.occupied;
+            res.send(JSON.stringify({message: 'Done'}));
+            return next(false);
+        }
+        return next(new BadRequestError('Param occupied or locked is not included'));
     }
 
     public async requestChangeTurnout(req: Request, res: Response, next: Next) {
@@ -54,7 +60,7 @@ export default class Handler {
             if (!body.hasOwnProperty('position')) {
                 return next(new BadRequestError('Param position is not included'));
             }
-            // this.turnoutService.handleRequestChange(req.params.turnoutId, body.position);
+            this.serviceTurnout.findByUId(req.params.turnoutId).requestedPosition = body.position;
         } catch (e) {
             return next(e);
         }
