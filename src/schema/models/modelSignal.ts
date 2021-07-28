@@ -76,8 +76,10 @@ export default class ModelSignal extends AbstractModel<BackendSignal.Definition,
     }
 
     public set requestedAspect(aspect: number) {
-        this._requestedAspect = AspectStrategy.findAllowedSignal(this, aspect);
-        this.getContainer().emit(Actions.Serial.MESSAGE_SEND, this.toSerialMessage(aspect));
+        const allowedAspect = AspectStrategy.findAllowedSignal(this, aspect);
+        this._requestedAspect = allowedAspect;
+        console.log(allowedAspect);
+        this.getContainer().emit(Actions.Serial.MESSAGE_SEND, this.toSerialMessage(allowedAspect));
         this.getContainer().emit(Actions.Signal.ASPECT_REQUESTED, this);
     }
 

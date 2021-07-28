@@ -38,7 +38,7 @@ export default class SerialConnector extends EventsConnector {
         }
     }
 
-    public send(data: SerialMessage): void {
+    private send(data: SerialMessage): void {
         const msg = SerialMapping.getSerialId(data.uId) + ':' + data.type + ':' + data.value + '\r\n';
         console.log('send:' + msg);
         this.connector.write(msg);
