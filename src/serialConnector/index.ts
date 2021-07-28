@@ -14,6 +14,10 @@ export default class SerialConnector extends EventsConnector {
 
     private port: string = '/dev/ttyUSB0';
 
+
+    private _readBuffer: SerialMessage[];
+    private _writeBuffer: SerialMessage[];
+
     public constructor() {
         super();
         this.tryConnect();
@@ -38,15 +42,19 @@ export default class SerialConnector extends EventsConnector {
         }
     }
 
-    public send(data: SerialMessage): void {
-        const msg = SerialMapping.getSerialId(data.uId) + ':' + data.type + ':' + data.value + '\r\n';
-        console.log('send:' + msg);
-        this.connector.write(msg);
+    public async writeBuffer(): Promise<void> {
+        await this._writeBuffer.forEach((data) => {
+            const msg = SerialMapping.getSerialId(data.uId) + ':' + data.type + ':' + data.value + '\r\n';
+            console.log('send:' + msg);
+            this.connector.write(msg);
+        });
+        this._writeBuffer = [];
+
     }
 
     private registerListener() {
         this.getContainer().on(Actions.Serial.MESSAGE_SEND, (message: SerialMessage) => {
-            this.send(message);
+            this._writeBuffer.push(message);
         });
     }
 
@@ -58,23 +66,24 @@ export default class SerialConnector extends EventsConnector {
         this.connector.pipe(parser);
 
         parser.on('data', (data) => {
-            this.handleReceive(data.toString());
+            const msg = data.toString();
+            if (!msg.match(/[0-9]+:[a-z]:-?[0-9]+/)) {
+                console.log('errored received:' + msg);
+                return null;
+            }
+            const [serialId, type, value] = msg.split(':');
+            const message: SerialMessage = {
+                uId: SerialMapping.getUId(+serialId),
+                type,
+                value: +value,
+            };
+            this._readBuffer.push(message);
         });
     }
 
-    private handleReceive(msg: string): void {
-        if (!msg.match(/[0-9]+:[a-z]:-?[0-9]+/)) {
-            console.log('errored received:' + msg);
-            return null;
-        }
-        const [serialId, type, value] = msg.split(':');
-        const message: SerialMessage = {
-            uId: SerialMapping.getUId(+serialId),
-            type,
-            value: +value,
-        };
-
-        this.getContainer().emit(Actions.Serial.MESSAGE_RECEIVE, message);
-        return;
+    public readBuffer(): SerialMessage[] {
+        const buffer = this._readBuffer;
+        this._readBuffer = [];
+        return buffer;
     }
 }
