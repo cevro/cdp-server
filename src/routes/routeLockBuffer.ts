@@ -15,58 +15,29 @@ export interface RouteLock {
 export default class RouteLockBuffer extends EventsConnector {
 
     private readonly serviceRoute: ServiceRoute;
-    private readonly serviceSignal: ServiceSignal;
-    private readonly serviceSector: ServiceSector;
-    private readonly serviceTurnout: ServiceTurnout;
-
-    private locked: boolean = false;
 
     private buffer: RouteLock[] = [];
 
-    private strategy: 'fifo' | 'lifo' | 'any' = 'fifo';
-
     constructor(
         serviceRoute: ServiceRoute,
-        serviceSignal: ServiceSignal,
-        serviceSector: ServiceSector,
-        serviceTurnout: ServiceTurnout,
     ) {
         super();
         this.serviceRoute = serviceRoute;
-        this.serviceSignal = serviceSignal;
-        this.serviceSector = serviceSector;
-        this.serviceTurnout = serviceTurnout;
-        this.registerListeners();
-    }
-
-    public addLock(lock: RouteLock): void {
-        this.buffer.push(lock);
-        this.getContainer().emit('@route-buffer/added-lock', lock);
-    }
-
-    private registerListeners(): void {
         this.getContainer().on('@route-buffer/add-lock', (routeId: string, buildOptions: BuildOptions) => {
-            const lock = this.createLock(routeId, buildOptions);
+            const route = this.serviceRoute.findByUId(routeId);
+            const lock = {
+                route,
+                buildOptions,
+            };
             this.addLock(lock);
         });
     }
 
-    private createLock(routeId: string, buildOptions: BuildOptions): RouteLock {
-        const route = this.serviceRoute.findByUId(routeId);
-        return {
-            route,
-            buildOptions,
-        };
+    public addLock(lock: RouteLock): void {
+        this.buffer.push(lock);
     }
 
-    private findAvailableRoutes(): RouteLock[] {
-        switch (this.strategy) {
-            case 'any':
-                return this.buffer;
-            case 'fifo':
-                return [this.buffer.shift()];
-            case 'lifo':
-                return [this.buffer.pop()];
-        }
+    public getBuffer(): RouteLock[] {
+        return this.buffer;
     }
 }

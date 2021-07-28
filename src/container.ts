@@ -30,9 +30,6 @@ class Container {
         if (!this.routeBuilder) {
             this.routeBuilder = new RouteLockBuffer(
                 (await this.getServiceRoute()),
-                (await this.getServiceSignal()),
-                (await this.getServiceSector()),
-                (await this.getServiceTurnout()),
             );
         }
         return this.routeBuilder;
